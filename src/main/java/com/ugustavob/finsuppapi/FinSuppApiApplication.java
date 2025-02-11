@@ -11,9 +11,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @OpenAPIDefinition(
         info = @Info(
-                title = "Spring JWT Authentication",
+                title = "FinSupp API",
                 version = "1.0",
-                description = "Spring JWT Authentication API"
+                description = "API for financial support management"
         )
 )
 @SecurityScheme(

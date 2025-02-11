@@ -1,10 +1,9 @@
 package com.ugustavob.finsuppapi.useCases.user;
 
-import com.ugustavob.finsuppapi.dto.RegisterRequestDTO;
+import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exceptions.UserAlreadyExistsException;
 import com.ugustavob.finsuppapi.repositories.user.UserRepository;
-import com.ugustavob.finsuppapi.security.TokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

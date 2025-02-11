@@ -1,8 +1,8 @@
 package com.ugustavob.finsuppapi.controllers;
 
-import com.ugustavob.finsuppapi.dto.LoginRequestDTO;
-import com.ugustavob.finsuppapi.dto.LoginResponseDTO;
-import com.ugustavob.finsuppapi.dto.RegisterRequestDTO;
+import com.ugustavob.finsuppapi.dto.users.LoginRequestDTO;
+import com.ugustavob.finsuppapi.dto.users.LoginResponseDTO;
+import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.security.TokenService;
 import com.ugustavob.finsuppapi.useCases.user.CreateUserUseCase;

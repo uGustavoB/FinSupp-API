@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.dto;
+package com.ugustavob.finsuppapi.dto.users;
 
 import java.util.Set;
 import java.util.UUID;

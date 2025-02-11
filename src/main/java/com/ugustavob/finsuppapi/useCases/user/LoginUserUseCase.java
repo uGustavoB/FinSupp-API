@@ -1,6 +1,6 @@
 package com.ugustavob.finsuppapi.useCases.user;
 
-import com.ugustavob.finsuppapi.dto.LoginRequestDTO;
+import com.ugustavob.finsuppapi.dto.users.LoginRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exceptions.InvalidCredentialsException;
 import com.ugustavob.finsuppapi.repositories.user.UserRepository;

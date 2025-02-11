@@ -1,9 +1,9 @@
 package com.ugustavob.finsuppapi.controllers;
 
-import com.ugustavob.finsuppapi.dto.AssignRoleRequestDTO;
-import com.ugustavob.finsuppapi.dto.GetAllUsersResponseDTO;
-import com.ugustavob.finsuppapi.dto.RegisterRequestDTO;
-import com.ugustavob.finsuppapi.dto.GetUserResponseDTO;
+import com.ugustavob.finsuppapi.dto.roles.AssignRoleRequestDTO;
+import com.ugustavob.finsuppapi.dto.users.GetAllUsersResponseDTO;
+import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
+import com.ugustavob.finsuppapi.dto.users.GetUserResponseDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exceptions.UserNotFoundException;
 import com.ugustavob.finsuppapi.useCases.role.AssignRoleUseCase;

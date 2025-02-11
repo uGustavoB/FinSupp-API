@@ -5,6 +5,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -54,6 +55,16 @@ public class ExceptionHandlerController {
     @ExceptionHandler
     public ResponseEntity<ErrorMessageDTO> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
         return new ResponseEntity<>(new ErrorMessageDTO(e.getMessage(), ""), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessageDTO> handleAccountAlreadyExistsException(AccountAlreadyExistsException e) {
+        return new ResponseEntity<>(new ErrorMessageDTO(e.getMessage(), ""), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessageDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return new ResponseEntity<>(new ErrorMessageDTO(e.getLocalizedMessage(), ""), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)

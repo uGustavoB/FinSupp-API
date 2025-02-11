@@ -1,6 +1,6 @@
 package com.ugustavob.finsuppapi.useCases.role;
 
-import com.ugustavob.finsuppapi.dto.AssignRoleRequestDTO;
+import com.ugustavob.finsuppapi.dto.roles.AssignRoleRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exceptions.UserAlreadyHasRoleException;
 import com.ugustavob.finsuppapi.repositories.user.UserRepository;

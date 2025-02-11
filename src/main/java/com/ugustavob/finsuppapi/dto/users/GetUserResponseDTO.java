@@ -1,6 +1,4 @@
-package com.ugustavob.finsuppapi.dto;
-
-import io.swagger.v3.oas.annotations.media.Schema;
+package com.ugustavob.finsuppapi.dto.users;
 
 import java.util.UUID;
 
