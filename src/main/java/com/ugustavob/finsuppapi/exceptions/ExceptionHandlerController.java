@@ -67,6 +67,11 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(new ErrorMessageDTO(e.getLocalizedMessage(), ""), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessageDTO> handleAccountNotFoundException(AccountNotFoundException e) {
+        return new ResponseEntity<>(new ErrorMessageDTO(e.getMessage(), ""), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");

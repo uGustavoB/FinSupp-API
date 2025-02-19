@@ -5,5 +5,5 @@ CREATE TABLE accounts (
     bank VARCHAR(50),
     account_type VARCHAR(20) NOT NULL,
     user_id UUID NOT NULL,
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE  CASCADE
 );

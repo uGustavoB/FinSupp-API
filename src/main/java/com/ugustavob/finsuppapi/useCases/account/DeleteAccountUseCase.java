@@ -1,0 +1,21 @@
+package com.ugustavob.finsuppapi.useCases.account;
+
+import com.ugustavob.finsuppapi.entities.account.AccountEntity;
+import com.ugustavob.finsuppapi.exceptions.AccountNotFoundException;
+import com.ugustavob.finsuppapi.repositories.account.AccountRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class DeleteAccountUseCase {
+    private final AccountRepository accountRepository;
+
+    public void execute(UUID uuid) {
+        AccountEntity accountEntity =
+                accountRepository.deleteByIdAndReturnEntity(uuid)
+                        .orElseThrow(AccountNotFoundException::new);
+    }
+}

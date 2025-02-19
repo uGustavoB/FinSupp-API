@@ -13,6 +13,8 @@ public record CreateAccountRequestDTO(
         AccountType accountType,
         @NotBlank(message = "Bank is required")
         @Schema(description = "Bank of the account", example = "Banco do Brasil")
-        String bank
+        String bank,
+        @Schema(description = "Initial balance of the account", example = "1000.00")
+        Double balance
 ) {
 }

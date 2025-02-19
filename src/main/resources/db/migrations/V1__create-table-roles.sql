@@ -1,7 +1,8 @@
-create table roles (
-    role    varchar(50) not null,
-    user_id uuid        not null
-        constraint fk_user
-            references users
-            on delete cascade
+CREATE TABLE roles (
+    role VARCHAR(50) NOT NULL,
+    user_id UUID NOT NULL,
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+        REFERENCES users (id)
+        ON DELETE CASCADE
 );

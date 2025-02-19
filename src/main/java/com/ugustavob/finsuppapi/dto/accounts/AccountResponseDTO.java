@@ -2,7 +2,10 @@ package com.ugustavob.finsuppapi.dto.accounts;
 
 import com.ugustavob.finsuppapi.entities.account.AccountType;
 
-public record GetAccountResponseDTO(
+import java.util.UUID;
+
+public record AccountResponseDTO(
+        UUID id,
         String description,
         String bank,
         AccountType accountType,
