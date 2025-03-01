@@ -8,8 +8,7 @@ import java.util.UUID;
 @Service
 public class BaseService {
 
-    public UUID checkIfUserIdIsNull(UUID uuid) {
-        System.out.println(uuid);
+    public UUID checkIfUuidIsNull(UUID uuid) {
         if (uuid == null) {
             throw new UserNotFoundException();
         }

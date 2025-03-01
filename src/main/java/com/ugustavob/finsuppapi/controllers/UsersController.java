@@ -5,6 +5,7 @@ import com.ugustavob.finsuppapi.dto.users.GetAllUsersResponseDTO;
 import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.dto.users.GetUserResponseDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
+import com.ugustavob.finsuppapi.exception.SelfDelectionException;
 import com.ugustavob.finsuppapi.exception.UserNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.useCases.role.AssignRoleUseCase;
@@ -26,6 +27,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -88,10 +90,86 @@ public class UsersController {
     @Schema(name = "UserEntity", implementation = UserEntity.class)
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> getUser(HttpServletRequest request) {
-        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
-        System.out.println(id);
+        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+
         UserEntity user = getUserUseCase.execute(id);
+
         return ResponseEntity.ok(new GetUserResponseDTO(user.getId(), user.getName(), user.getEmail()));
+    }
+
+    @Operation(
+            summary = "Get all users",
+            description = "Retrieve a list of all users (Admin access required)."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Users found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = GetAllUsersResponseDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Unauthorized",
+                                            summary = "Unauthorized",
+                                            value = "Unauthorized"
+                                    )
+                            },
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Forbidden",
+                                            summary = "User is not an admin",
+                                            value = "User is not an admin"
+                                    )
+                            },
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Users not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Users not found",
+                                            summary = "Users not found",
+                                            value = "Users not found"
+                                    )
+                            },
+                            schema = @Schema(implementation = String.class)
+                    )
+            )
+    })
+    @Schema(name = "UserEntity", implementation = UserEntity.class)
+    @SecurityRequirement(name = "bearer")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/")
+    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
+        baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+
+        List<GetAllUsersResponseDTO> users = getAllUsersUseCase.execute();
+
+        if (users == null) {
+            throw new UserNotFoundException();
+        }
+
+        return ResponseEntity.ok(users);
     }
 
     @PutMapping("/me/")
@@ -175,102 +253,21 @@ public class UsersController {
             RegisterRequestDTO registerRequestDTO,
             HttpServletRequest request
     ) {
-        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
+        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        try {
-            UserEntity user = updateUserUseCase.execute(new UserEntity(id, registerRequestDTO.name(),
-                    registerRequestDTO.email(), registerRequestDTO.password(), null));
-            return ResponseEntity.ok(new GetUserResponseDTO(user.getId(), user.getName(), user.getEmail()));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
-    @Operation(
-            summary = "Get all users",
-            description = "Retrieve a list of all users (Admin access required)."
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Users found",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = GetAllUsersResponseDTO.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Unauthorized",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Unauthorized",
-                                            summary = "Unauthorized",
-                                            value = "Unauthorized"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Forbidden",
-                                            summary = "User is not an admin",
-                                            value = "User is not an admin"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Users not found",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Users not found",
-                                            summary = "Users not found",
-                                            value = "Users not found"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
-                    )
-            )
-    })
-    @Schema(name = "UserEntity", implementation = UserEntity.class)
-    @SecurityRequirement(name = "bearer")
-    @GetMapping("/")
-    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
-        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
-        System.out.println(id);
-        try {
-            UserEntity user = getUserUseCase.execute(id);
-
-            if (user.getRole().contains("ROLE_ADMIN")) {
-                List<GetAllUsersResponseDTO> users = getAllUsersUseCase.execute();
-
-                if (users == null) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Users not found");
-                }
-
-                return ResponseEntity.ok(users);
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not an admin");
-            }
-
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        UserEntity user = updateUserUseCase.execute(
+                new UserEntity(
+                        id,
+                        registerRequestDTO.name(),
+                        registerRequestDTO.email(),
+                        registerRequestDTO.password(),
+                        null));
+        return ResponseEntity.ok(
+                new GetUserResponseDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()
+                ));
     }
 
     @Operation(
@@ -345,31 +342,19 @@ public class UsersController {
             )
     })
     @SecurityRequirement(name = "bearer")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     @DeleteMapping("/{uuid}")
     public ResponseEntity<?> deleteUser(HttpServletRequest request, @PathVariable UUID uuid) {
-        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
+        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        try {
-            UserEntity user = getUserUseCase.execute(id);
-
-            if (user.getRole().contains("ROLE_ADMIN")) {
-                if (id.toString().equals(uuid.toString())) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't delete yourself");
-                }
-
-                deleteUserUseCase.execute(uuid);
-
-                return ResponseEntity.ok("User deleted");
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User is not an admin");
-            }
-
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        if (id.toString().equals(uuid.toString())) {
+            throw new SelfDelectionException();
         }
+
+        deleteUserUseCase.execute(uuid);
+
+        return ResponseEntity.ok("User deleted");
     }
 
     @Operation(
@@ -448,30 +433,18 @@ public class UsersController {
     })
     @Schema(name = "AssignRoleRequestDTO", implementation = AssignRoleRequestDTO.class)
     @SecurityRequirement(name = "bearer")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/{uuid}/roles")
     public ResponseEntity<Object> assignRole(
             HttpServletRequest request,
             @Valid @RequestBody AssignRoleRequestDTO assignRoleRequestDTO,
-            @PathVariable String uuid
+            @PathVariable UUID uuid
     ) {
-        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
+        baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        try {
-            UserEntity user = getUserUseCase.execute(id);
+        UserEntity updatedUser = assignRoleUseCase.execute(assignRoleRequestDTO, uuid);
 
-            if (user.getRole().contains("ROLE_ADMIN")) {
-                UserEntity updatedUser = assignRoleUseCase.execute(assignRoleRequestDTO, UUID.fromString(uuid));
-
-                return ResponseEntity.ok(updatedUser);
-            } else {
-                return ResponseEntity.badRequest().body("User is not an admin");
-            }
-
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(updatedUser);
 
     }
 }
