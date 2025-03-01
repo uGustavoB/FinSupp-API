@@ -2,8 +2,8 @@ package com.ugustavob.finsuppapi.useCases.account;
 
 import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
-import com.ugustavob.finsuppapi.exceptions.AccountAlreadyExistsException;
-import com.ugustavob.finsuppapi.exceptions.AccountNotFoundException;
+import com.ugustavob.finsuppapi.exception.AccountAlreadyExistsException;
+import com.ugustavob.finsuppapi.exception.AccountNotFoundException;
 import com.ugustavob.finsuppapi.repositories.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

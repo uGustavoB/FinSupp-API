@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.exceptions;
+package com.ugustavob.finsuppapi.exception;
 
 public class InvalidCredentialsException extends RuntimeException{
     private static final String defaultMessage = "Invalid credentials";

@@ -2,7 +2,7 @@ package com.ugustavob.finsuppapi.useCases.user;
 
 import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.exceptions.UserAlreadyExistsException;
+import com.ugustavob.finsuppapi.exception.UserAlreadyExistsException;
 import com.ugustavob.finsuppapi.repositories.user.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.exceptions;
+package com.ugustavob.finsuppapi.exception;
 
 public class AccountAlreadyExistsException extends RuntimeException {
     private static final String defaultMessage = "Account already exists! Please, try again with a different " +

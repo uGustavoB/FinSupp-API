@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.exceptions;
+package com.ugustavob.finsuppapi.exception;
 
 public class AccountNotFoundException extends RuntimeException {
     private static final String defaultMessage = "Account not found";

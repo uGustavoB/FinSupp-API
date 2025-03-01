@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.exceptions;
+package com.ugustavob.finsuppapi.exception;
 
 public class UserNotFoundException extends RuntimeException {
     private static final String defaultMessage = "User not found";

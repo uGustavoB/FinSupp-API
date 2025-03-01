@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.exceptions;
+package com.ugustavob.finsuppapi.exception;
 
 public class UserAlreadyHasRoleException extends RuntimeException{
     public UserAlreadyHasRoleException() {

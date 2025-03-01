@@ -1,13 +1,13 @@
 package com.ugustavob.finsuppapi.controllers;
 
-import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.dto.accounts.AccountResponseDTO;
+import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.exceptions.AccountNotFoundException;
-import com.ugustavob.finsuppapi.exceptions.UserNotFoundException;
 import com.ugustavob.finsuppapi.repositories.account.AccountRepository;
-import com.ugustavob.finsuppapi.repositories.user.UserRepository;
+import com.ugustavob.finsuppapi.services.AccountService;
+import com.ugustavob.finsuppapi.services.BaseService;
+import com.ugustavob.finsuppapi.services.UserService;
 import com.ugustavob.finsuppapi.useCases.account.CreateAccountUseCase;
 import com.ugustavob.finsuppapi.useCases.account.DeleteAccountUseCase;
 import com.ugustavob.finsuppapi.useCases.account.UpdateAccountUseCase;
@@ -15,13 +15,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -30,171 +28,76 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccountController {
     private final CreateAccountUseCase createAccountUseCase;
-    private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final UpdateAccountUseCase updateAccountUseCase;
     private final DeleteAccountUseCase deleteAccountUseCase;
+    private final AccountService accountService;
+    private final BaseService baseService;
+    private final UserService userService;
 
-    @PostMapping("/")
+
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> createAccount(@RequestBody CreateAccountRequestDTO createAccountRequestDTO, HttpServletRequest request) {
-        var id = (UUID) request.getAttribute("id");
+    public ResponseEntity<?> getAccount(@PathVariable UUID id, HttpServletRequest request) {
+        var userId = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
+        AccountEntity accountEntity = accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
-        if (id == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        try {
-            Optional<UserEntity> userEntity = userRepository.findById(id);
-
-            if (userEntity.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
-
-            AccountEntity account = createAccountUseCase.execute(createAccountRequestDTO, userEntity.get());
-
-            return ResponseEntity.created(null).body(new AccountResponseDTO(
-                    account.getId(),
-                    account.getDescription(),
-                    account.getBank(),
-                    account.getAccountType(),
-                    account.getBalance()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        return ResponseEntity.ok(accountService.entityToResponseDto(accountEntity));
     }
 
     @GetMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> getAccounts(HttpServletRequest request) {
-        var id = (UUID) request.getAttribute("id");
+        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
 
-        if (id == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+        userService.validateUserByIdAndReturn(id);
 
-        try {
-            Optional<UserEntity> userEntity = userRepository.findById(id);
+        ArrayList<AccountResponseDTO> accounts = new ArrayList<>();
 
-            if (userEntity.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
+        accountRepository.findAllByUserId(id).forEach(accountEntity -> accounts.add(
+                accountService.entityToResponseDto(accountEntity)
+        ));
 
-            ArrayList<AccountResponseDTO> accounts = new ArrayList<>();
-
-            accountRepository.findAllByUserId(id).forEach(account -> accounts.add(new AccountResponseDTO(
-                    account.getId(),
-                    account.getDescription(),
-                    account.getBank(),
-                    account.getAccountType(),
-                    account.getBalance()
-            )));
-
-            return ResponseEntity.ok(accounts);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        return ResponseEntity.ok(accounts);
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> getAccount(@PathVariable UUID id, HttpServletRequest request) {
-        var userId = (UUID) request.getAttribute("id");
+    public ResponseEntity<?> createAccount(@RequestBody CreateAccountRequestDTO createAccountRequestDTO, HttpServletRequest request) {
+        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
 
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+        UserEntity userEntity = userService.validateUserByIdAndReturn(id);
 
-        try {
-            Optional<UserEntity> userEntity = userRepository.findById(userId);
+        AccountEntity accountEntity = createAccountUseCase.execute(createAccountRequestDTO, userEntity);
 
-            if (userEntity.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
-
-            Optional<AccountEntity> accountEntity = accountRepository.findById(id);
-
-            if (accountEntity.isEmpty() || !accountEntity.get().getUser().getId().equals(userId)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found");
-            }
-
-            return ResponseEntity.ok(new AccountResponseDTO(
-                    accountEntity.get().getId(),
-                    accountEntity.get().getDescription(),
-                    accountEntity.get().getBank(),
-                    accountEntity.get().getAccountType(),
-                    accountEntity.get().getBalance()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        return ResponseEntity.created(null).body(accountService.entityToResponseDto(accountEntity));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> updateAccount(@PathVariable UUID id, @RequestBody CreateAccountRequestDTO createAccountRequestDTO, HttpServletRequest request) {
-        var userId = (UUID) request.getAttribute("id");
+        var userId = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
 
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+        AccountEntity accountEntity = accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
-        try {
-            Optional<UserEntity> userEntity = userRepository.findById(userId);
+        AccountEntity newAccountEntity = updateAccountUseCase.execute(createAccountRequestDTO, accountEntity);
 
-            if (userEntity.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
-
-            Optional<AccountEntity> accountEntity = accountRepository.findById(id);
-
-            if (accountEntity.isEmpty() || !accountEntity.get().getUser().getId().equals(userId)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Account not found");
-            }
-
-            AccountEntity account = updateAccountUseCase.execute(createAccountRequestDTO, accountEntity.get());
-
-            return ResponseEntity.ok(new AccountResponseDTO(
-                    account.getId(),
-                    account.getDescription(),
-                    account.getBank(),
-                    account.getAccountType(),
-                    account.getBalance()
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        return ResponseEntity.ok(accountService.entityToResponseDto(newAccountEntity));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> deleteAccount(@PathVariable UUID id, HttpServletRequest request) {
-        var userId = (UUID) request.getAttribute("id");
+        var userId = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
 
-        Optional<AccountEntity> account = accountRepository.findById(id);
+        accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
-        if (account.isPresent()) {
-            Optional<UserEntity> user = userRepository.findById(account.get().getUser().getId());
-
-            if (user.isEmpty()) {
-
-                throw new UserNotFoundException();
-            }
-
-            if (!userId.equals(user.get().getId())) {
-                throw new AccountNotFoundException();
-            }
-
-            deleteAccountUseCase.execute(id);
-            return ResponseEntity.ok().body("Account deleted");
-        }
-
-        throw new AccountNotFoundException();
+        deleteAccountUseCase.execute(id);
+        return ResponseEntity.ok().body("Account deleted");
     }
 }

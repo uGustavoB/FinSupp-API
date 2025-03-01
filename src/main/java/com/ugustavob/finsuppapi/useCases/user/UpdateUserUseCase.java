@@ -1,7 +1,7 @@
 package com.ugustavob.finsuppapi.useCases.user;
 
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.exceptions.UserNotFoundException;
+import com.ugustavob.finsuppapi.exception.UserNotFoundException;
 import com.ugustavob.finsuppapi.repositories.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -5,7 +5,8 @@ import com.ugustavob.finsuppapi.dto.users.GetAllUsersResponseDTO;
 import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.dto.users.GetUserResponseDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.exceptions.UserNotFoundException;
+import com.ugustavob.finsuppapi.exception.UserNotFoundException;
+import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.useCases.role.AssignRoleUseCase;
 import com.ugustavob.finsuppapi.useCases.user.DeleteUserUseCase;
 import com.ugustavob.finsuppapi.useCases.user.GetAllUsersUseCase;
@@ -40,6 +41,7 @@ public class UsersController {
     private final GetAllUsersUseCase getAllUsersUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
+    private final BaseService baseService;
 
     @GetMapping("/me/")
     @Operation(summary = "Get user", description = "Get the authenticated user's details.")
@@ -86,20 +88,10 @@ public class UsersController {
     @Schema(name = "UserEntity", implementation = UserEntity.class)
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> getUser(HttpServletRequest request) {
-        var id = (UUID) request.getAttribute("id");
-
-        if (id == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        try {
-            UserEntity user = getUserUseCase.execute(id);
-            return ResponseEntity.ok(new GetUserResponseDTO(user.getId(), user.getName(), user.getEmail()));
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
+        System.out.println(id);
+        UserEntity user = getUserUseCase.execute(id);
+        return ResponseEntity.ok(new GetUserResponseDTO(user.getId(), user.getName(), user.getEmail()));
     }
 
     @PutMapping("/me/")
@@ -183,11 +175,7 @@ public class UsersController {
             RegisterRequestDTO registerRequestDTO,
             HttpServletRequest request
     ) {
-        var id = (UUID) request.getAttribute("id");
-
-        if (id == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
 
         try {
             UserEntity user = updateUserUseCase.execute(new UserEntity(id, registerRequestDTO.name(),
@@ -261,8 +249,8 @@ public class UsersController {
     @SecurityRequirement(name = "bearer")
     @GetMapping("/")
     public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
-        var id = (UUID) request.getAttribute("id");
-
+        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
+        System.out.println(id);
         try {
             UserEntity user = getUserUseCase.execute(id);
 
@@ -360,7 +348,7 @@ public class UsersController {
     @Transactional
     @DeleteMapping("/{uuid}")
     public ResponseEntity<?> deleteUser(HttpServletRequest request, @PathVariable UUID uuid) {
-        var id = (UUID) request.getAttribute("id");
+        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
 
         try {
             UserEntity user = getUserUseCase.execute(id);
@@ -466,11 +454,7 @@ public class UsersController {
             @Valid @RequestBody AssignRoleRequestDTO assignRoleRequestDTO,
             @PathVariable String uuid
     ) {
-        var id = (UUID) request.getAttribute("id");
-
-        if (id == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
+        var id = baseService.checkIfUserIdIsNull((UUID) request.getAttribute("id"));
 
         try {
             UserEntity user = getUserUseCase.execute(id);

@@ -1,6 +1,5 @@
-package com.ugustavob.finsuppapi.exceptions;
+package com.ugustavob.finsuppapi.exception;
 
-import org.hibernate.annotations.NotFound;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -22,9 +21,9 @@ public class ExceptionHandlerController {
         this.messageSource = messageSource;
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorMessageDTO> handleUserNotFoundException(UserNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorMessageDTO(e.getMessage(), ""));
+        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -40,36 +39,38 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(dto, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ErrorMessageDTO> handleInvalidCredentialsException(InvalidCredentialsException e) {
-        return new ResponseEntity<>(new ErrorMessageDTO(e.getMessage(), ""), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
     }
 
 
 
-    @ExceptionHandler
+    @ExceptionHandler(UserAlreadyHasRoleException.class)
     public ResponseEntity<ErrorMessageDTO> handleUserAlreadyHasRoleException(UserAlreadyHasRoleException e) {
-        return new ResponseEntity<>(new ErrorMessageDTO(e.getMessage(), ""), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorMessageDTO> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
-        return new ResponseEntity<>(new ErrorMessageDTO(e.getMessage(), ""), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(AccountAlreadyExistsException.class)
     public ResponseEntity<ErrorMessageDTO> handleAccountAlreadyExistsException(AccountAlreadyExistsException e) {
-        return new ResponseEntity<>(new ErrorMessageDTO(e.getMessage(), ""), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorMessageDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return new ResponseEntity<>(new ErrorMessageDTO(e.getLocalizedMessage(), ""), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getLocalizedMessage()).build(),
+                HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ErrorMessageDTO> handleAccountNotFoundException(AccountNotFoundException e) {
-        return new ResponseEntity<>(new ErrorMessageDTO(e.getMessage(), ""), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
