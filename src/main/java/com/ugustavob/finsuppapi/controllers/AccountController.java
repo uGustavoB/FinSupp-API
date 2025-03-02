@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.controllers;
 
+import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.accounts.AccountResponseDTO;
 import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
@@ -43,7 +44,10 @@ public class AccountController {
         var userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
         AccountEntity accountEntity = accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
-        return ResponseEntity.ok(accountService.entityToResponseDto(accountEntity));
+        return ResponseEntity.ok(new SuccessResponseDTO<>(
+                "Account found",
+                accountService.entityToResponseDto(accountEntity)
+        ));
     }
 
     @GetMapping("/")
@@ -60,7 +64,10 @@ public class AccountController {
                 accountService.entityToResponseDto(accountEntity)
         ));
 
-        return ResponseEntity.ok(accounts);
+        return ResponseEntity.ok(new SuccessResponseDTO<>(
+                "Accounts found",
+                accounts
+        ));
     }
 
     @PostMapping("/")
@@ -73,7 +80,10 @@ public class AccountController {
 
         AccountEntity accountEntity = createAccountUseCase.execute(createAccountRequestDTO, userEntity);
 
-        return ResponseEntity.created(null).body(accountService.entityToResponseDto(accountEntity));
+        return ResponseEntity.created(null).body(new SuccessResponseDTO<>(
+                "Account created",
+                accountService.entityToResponseDto(accountEntity)
+        ));
     }
 
     @PutMapping("/{id}")
@@ -86,7 +96,10 @@ public class AccountController {
 
         AccountEntity newAccountEntity = updateAccountUseCase.execute(createAccountRequestDTO, accountEntity);
 
-        return ResponseEntity.ok(accountService.entityToResponseDto(newAccountEntity));
+        return ResponseEntity.ok(new SuccessResponseDTO<>(
+                "Account updated",
+                accountService.entityToResponseDto(newAccountEntity)
+        ));
     }
 
     @DeleteMapping("/{id}")
@@ -98,6 +111,6 @@ public class AccountController {
         accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
         deleteAccountUseCase.execute(id);
-        return ResponseEntity.ok().body("Account deleted");
+        return ResponseEntity.ok().body(new SuccessResponseDTO<>("Account deleted"));
     }
 }

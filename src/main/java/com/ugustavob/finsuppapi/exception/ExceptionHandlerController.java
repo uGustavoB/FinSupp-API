@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.exception;
 
+import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -23,65 +24,66 @@ public class ExceptionHandlerController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<ErrorMessageDTO>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        List<ErrorMessageDTO> dto = new ArrayList<>();
+    public ResponseEntity<List<ErrorResponseDTO>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        List<ErrorResponseDTO> dto = new ArrayList<>();
 
         e.getBindingResult().getFieldErrors().forEach(err -> {
             String message = messageSource.getMessage(err, LocaleContextHolder.getLocale());
 
-            dto.add(new ErrorMessageDTO(message,null, err.getField()));
+            dto.add(new ErrorResponseDTO(message,"Error", err.getField().substring(0,1).toUpperCase() + err.getField().substring(1)));
         });
 
         return new ResponseEntity<>(dto, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ErrorMessageDTO> handleInvalidCredentialsException(InvalidCredentialsException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDTO> handleInvalidCredentialsException(InvalidCredentialsException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(SelfDelectionException.class)
-    public ResponseEntity<ErrorMessageDTO> handleSelfDelectionException(SelfDelectionException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.FORBIDDEN);
+    public ResponseEntity<ErrorResponseDTO> handleSelfDelectionException(SelfDelectionException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.FORBIDDEN);
     }
 
 //  User Exceptions
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorMessageDTO> handleUserNotFoundException(UserNotFoundException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ErrorResponseDTO> handleUserNotFoundException(UserNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UserAlreadyHasRoleException.class)
-    public ResponseEntity<ErrorMessageDTO> handleUserAlreadyHasRoleException(UserAlreadyHasRoleException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDTO> handleUserAlreadyHasRoleException(UserAlreadyHasRoleException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorMessageDTO> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDTO> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).field("Email").build(),
+                HttpStatus.CONFLICT);
     }
 
 //  Account Exceptions
     @ExceptionHandler(AccountAlreadyExistsException.class)
-    public ResponseEntity<ErrorMessageDTO> handleAccountAlreadyExistsException(AccountAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponseDTO> handleAccountAlreadyExistsException(AccountAlreadyExistsException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<ErrorMessageDTO> handleAccountNotFoundException(AccountNotFoundException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(),
+    public ResponseEntity<ErrorResponseDTO> handleAccountNotFoundException(AccountNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
                 HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorMessageDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getLocalizedMessage()).build(),
+    public ResponseEntity<ErrorResponseDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getLocalizedMessage()).build(),
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorMessageDTO> handleAccessDeniedException(AccessDeniedException e) {
-        return new ResponseEntity<>(ErrorMessageDTO.builder().message(e.getMessage()).build(),
+    public ResponseEntity<ErrorResponseDTO> handleAccessDeniedException(AccessDeniedException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
                 HttpStatus.FORBIDDEN);
     }
 

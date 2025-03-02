@@ -22,9 +22,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfig(SecurityFilter securityFilter, CustomUserDetailsService customUserDetailsService) {
+    public SecurityConfig(SecurityFilter securityFilter, CustomUserDetailsService customUserDetailsService, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.securityFilter = securityFilter;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     private static final String[] SWAGGER_UI_PATHS = {
@@ -45,9 +47,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                        }))
+                        .authenticationEntryPoint(customAuthenticationEntryPoint))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

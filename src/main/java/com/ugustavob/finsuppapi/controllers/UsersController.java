@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.controllers;
 
+import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.roles.AssignRoleRequestDTO;
 import com.ugustavob.finsuppapi.dto.users.GetAllUsersResponseDTO;
@@ -53,7 +54,22 @@ public class UsersController {
                     description = "User found",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserEntity.class)
+                            schema = @Schema(implementation = SuccessResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "User found",
+                                              "type": "Success",
+                                              "data": {
+                                                "id": "123e4567-e89b-12d3-a456-426614174000",
+                                                "name": "João Silva",
+                                                "email": "joao.silva@example.com"
+                                              },
+                                              "dataList": null,
+                                              "pagination": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -61,14 +77,16 @@ public class UsersController {
                     description = "Unauthorized",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Unauthorized",
-                                            summary = "Unauthorized",
-                                            value = "Unauthorized"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                                {
+                                                  "message": "Unauthorized",
+                                                  "type": "Error",
+                                                  "field": null
+                                                }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -76,20 +94,21 @@ public class UsersController {
                     description = "User not found",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "User not found",
-                                            summary = "User not found",
-                                            value = "User not found"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                                {
+                                                    "message": "User not found",
+                                                    "type": "Error",
+                                                    "field": null
+                                                }
+                                            """
+                            )
                     )
             )
     })
-    @Schema(name = "UserEntity", implementation = UserEntity.class)
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> getUser(HttpServletRequest request) {
+    public ResponseEntity<SuccessResponseDTO<GetUserResponseDTO>> getUser(HttpServletRequest request) {
         var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
         UserEntity user = getUserUseCase.execute(id);
@@ -97,22 +116,47 @@ public class UsersController {
         return ResponseEntity.ok(
                 new SuccessResponseDTO<>(
                         "User found",
-                        new GetUserResponseDTO(user.getId(),user.getName(),user.getEmail())
+                        new GetUserResponseDTO(user.getId(), user.getName(), user.getEmail())
                 )
         );
     }
 
-    @Operation(
-            summary = "Get all users",
-            description = "Retrieve a list of all users (Admin access required)."
-    )
+    @GetMapping("/")
+    @Operation(summary = "Get all users", description = "Retrieve a list of all users (Admin access required).")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Users found",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = GetAllUsersResponseDTO.class)
+                            schema = @Schema(implementation = SuccessResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "Users found",
+                                              "type": "Success",
+                                              "data": null,
+                                              "dataList": [
+                                                {
+                                                  "id": "123e4567-e89b-12d3-a456-426614174000",
+                                                  "name": "João Silva",
+                                                  "email": "joao.silva@example.com"
+                                                },
+                                                {
+                                                  "id": "123e4567-e89b-12d3-a456-426614174001",
+                                                  "name": "Maria Souza",
+                                                  "email": "maria.souza@example.com"
+                                                }
+                                              ],
+                                              "pagination": {
+                                                "currentPage": 0,
+                                                "pageSize": 10,
+                                                "totalPages": 5,
+                                                "totalElements": 50
+                                              }
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -120,14 +164,16 @@ public class UsersController {
                     description = "Unauthorized",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Unauthorized",
-                                            summary = "Unauthorized",
-                                            value = "Unauthorized"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "Unauthorized",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -135,14 +181,16 @@ public class UsersController {
                     description = "Forbidden",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Forbidden",
-                                            summary = "User is not an admin",
-                                            value = "User is not an admin"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "User is not an admin",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -150,22 +198,22 @@ public class UsersController {
                     description = "Users not found",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Users not found",
-                                            summary = "Users not found",
-                                            value = "Users not found"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "Users not found",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             )
     })
-    @Schema(name = "UserEntity", implementation = UserEntity.class)
     @SecurityRequirement(name = "bearer")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @GetMapping("/")
-    public ResponseEntity<?> getAllUsers(
+    public ResponseEntity<SuccessResponseDTO<GetAllUsersResponseDTO>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request
@@ -194,14 +242,22 @@ public class UsersController {
                     description = "User updated",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "User updated",
-                                            summary = "User updated",
-                                            value = "User updated successfully"
-                                    )
-                            },
-                            schema = @Schema(implementation = GetUserResponseDTO.class)
+                            schema = @Schema(implementation = SuccessResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "User updated",
+                                              "type": "Success",
+                                              "data": {
+                                                "id": "123e4567-e89b-12d3-a456-426614174000",
+                                                "name": "João Silva",
+                                                "email": "joao.silva@example.com"
+                                              },
+                                              "dataList": null,
+                                              "pagination": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -209,14 +265,16 @@ public class UsersController {
                     description = "Unauthorized",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Unauthorized",
-                                            summary = "Unauthorized",
-                                            value = "Unauthorized"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "Unauthorized",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -224,14 +282,16 @@ public class UsersController {
                     description = "User not found",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "User not found",
-                                            summary = "User not found",
-                                            value = "User not found"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "User not found",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -239,30 +299,41 @@ public class UsersController {
                     description = "Unprocessable entity",
                     content = @Content(
                             mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "Unprocessable entity",
-                                            summary = "Name is required",
-                                            value = "Name is required"
+                                            value = """
+                                                    {
+                                                      "message": "Name is required",
+                                                      "type": "Error",
+                                                      "field": "name"
+                                                    }
+                                                    """
                                     ),
                                     @ExampleObject(
-                                            name = "Unprocessable entity",
-                                            summary = "Email is required",
-                                            value = "Email is required"
+                                            value = """
+                                                    {
+                                                      "message": "Email is required",
+                                                      "type": "Error",
+                                                      "field": "email"
+                                                    }
+                                                    """
                                     ),
                                     @ExampleObject(
-                                            name = "Unprocessable entity",
-                                            summary = "Invalid email",
-                                            value = "Invalid email"
+                                            value = """
+                                                    {
+                                                      "message": "Invalid email",
+                                                      "type": "Error",
+                                                      "field": "email"
+                                                    }
+                                                    """
                                     )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            }
                     )
             )
     })
-    @Schema(name = "UserEntity", implementation = UserEntity.class)
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> updateUser(
+    public ResponseEntity<SuccessResponseDTO<GetUserResponseDTO>> updateUser(
             @Valid @RequestBody
             RegisterRequestDTO registerRequestDTO,
             HttpServletRequest request
@@ -279,29 +350,31 @@ public class UsersController {
         return ResponseEntity.ok(
                 new SuccessResponseDTO<>(
                         "User updated",
-                        new GetUserResponseDTO(user.getId(),user.getName(),user.getEmail())
+                        new GetUserResponseDTO(user.getId(), user.getName(), user.getEmail())
                 )
         );
     }
 
-    @Operation(
-            summary = "Delete user",
-            description = "Delete a user (Restricted to admins. Users cannot delete themselves)."
-    )
+    @DeleteMapping("/{uuid}")
+    @Operation(summary = "Delete user", description = "Delete a user (Restricted to admins. Users cannot delete themselves).")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "User deleted",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "User deleted",
-                                            summary = "User deleted",
-                                            value = "User deleted successfully"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = SuccessResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "User deleted",
+                                              "type": "Success",
+                                              "data": null,
+                                              "dataList": null,
+                                              "pagination": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -309,14 +382,16 @@ public class UsersController {
                     description = "Unauthorized",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Unauthorized",
-                                            summary = "Unauthorized",
-                                            value = "Unauthorized"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "Unauthorized",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -324,19 +399,27 @@ public class UsersController {
                     description = "Forbidden",
                     content = @Content(
                             mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
                             examples = {
                                     @ExampleObject(
-                                            name = "Forbidden",
-                                            summary = "User is not an admin",
-                                            value = "User is not an admin"
+                                            value = """
+                                                    {
+                                                      "message": "User is not an admin",
+                                                      "type": "Error",
+                                                      "field": null
+                                                    }
+                                                    """
                                     ),
                                     @ExampleObject(
-                                            name = "Forbidden",
-                                            summary = "You can't delete yourself",
-                                            value = "You can't delete yourself"
+                                            value = """
+                                                    {
+                                                      "message": "You can't delete yourself",
+                                                      "type": "Error",
+                                                      "field": null
+                                                    }
+                                                    """
                                     )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            }
                     )
             ),
             @ApiResponse(
@@ -344,22 +427,23 @@ public class UsersController {
                     description = "User not found",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "User not found",
-                                            summary = "User not found",
-                                            value = "User not found"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "User not found",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             )
     })
     @SecurityRequirement(name = "bearer")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<?> deleteUser(HttpServletRequest request, @PathVariable UUID uuid) {
+    public ResponseEntity<SuccessResponseDTO<?>> deleteUser(HttpServletRequest request, @PathVariable UUID uuid) {
         var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
         if (id.toString().equals(uuid.toString())) {
@@ -375,17 +459,30 @@ public class UsersController {
         );
     }
 
-    @Operation(
-            summary = "Assign role",
-            description = "Assign a new role to a user (Restricted to admins. A user cannot be assigned a role they already have)."
-    )
+    @PostMapping("/{uuid}/roles")
+    @Operation(summary = "Assign role", description = "Assign a new role to a user (Restricted to admins. A user cannot be assigned a role they already have).")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
                     description = "Role assigned successfully",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = UserEntity.class)
+                            schema = @Schema(implementation = SuccessResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "Role assigned successfully",
+                                              "type": "Success",
+                                              "data": {
+                                                "id": "123e4567-e89b-12d3-a456-426614174000",
+                                                "name": "João Silva",
+                                                "email": "joao.silva@example.com"
+                                              },
+                                              "dataList": null,
+                                              "pagination": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -393,14 +490,16 @@ public class UsersController {
                     description = "Unauthorized",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Unauthorized",
-                                            summary = "Unauthorized",
-                                            value = "Unauthorized"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "Unauthorized",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -408,14 +507,16 @@ public class UsersController {
                     description = "User not found",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "User not found",
-                                            summary = "User not found",
-                                            value = "User not found"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "User not found",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -423,14 +524,16 @@ public class UsersController {
                     description = "Conflict",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Conflict",
-                                            summary = "User already has role",
-                                            value = "User already has role"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "User already has role",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             ),
             @ApiResponse(
@@ -438,22 +541,22 @@ public class UsersController {
                     description = "Unprocessable entity",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Unprocessable entity",
-                                            summary = "Role is required",
-                                            value = "Role is required"
-                                    )
-                            },
-                            schema = @Schema(implementation = String.class)
+                            schema = @Schema(implementation = ErrorResponseDTO.class),
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                              "message": "Role is required",
+                                              "type": "Error",
+                                              "field": null
+                                            }
+                                            """
+                            )
                     )
             )
     })
-    @Schema(name = "AssignRoleRequestDTO", implementation = AssignRoleRequestDTO.class)
     @SecurityRequirement(name = "bearer")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PostMapping("/{uuid}/roles")
-    public ResponseEntity<Object> assignRole(
+    public ResponseEntity<SuccessResponseDTO<GetUserResponseDTO>> assignRole(
             HttpServletRequest request,
             @Valid @RequestBody AssignRoleRequestDTO assignRoleRequestDTO,
             @PathVariable UUID uuid
@@ -465,7 +568,7 @@ public class UsersController {
         return ResponseEntity.ok(
                 new SuccessResponseDTO<>(
                         "Role assigned successfully",
-                        new GetUserResponseDTO(updatedUser.getId(),updatedUser.getName(),updatedUser.getEmail())
+                        new GetUserResponseDTO(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail())
                 )
         );
     }
