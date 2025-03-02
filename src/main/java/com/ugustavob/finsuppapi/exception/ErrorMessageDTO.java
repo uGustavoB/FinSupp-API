@@ -10,5 +10,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorMessageDTO {
     private String message;
+    @Builder.Default
+    private String type = "Error";
     private String field;
 }

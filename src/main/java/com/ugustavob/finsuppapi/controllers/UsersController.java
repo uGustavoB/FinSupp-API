@@ -1,16 +1,17 @@
 package com.ugustavob.finsuppapi.controllers;
 
+import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.roles.AssignRoleRequestDTO;
 import com.ugustavob.finsuppapi.dto.users.GetAllUsersResponseDTO;
-import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.dto.users.GetUserResponseDTO;
+import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.SelfDelectionException;
 import com.ugustavob.finsuppapi.exception.UserNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
+import com.ugustavob.finsuppapi.services.UserService;
 import com.ugustavob.finsuppapi.useCases.role.AssignRoleUseCase;
 import com.ugustavob.finsuppapi.useCases.user.DeleteUserUseCase;
-import com.ugustavob.finsuppapi.useCases.user.GetAllUsersUseCase;
 import com.ugustavob.finsuppapi.useCases.user.GetUserUseCase;
 import com.ugustavob.finsuppapi.useCases.user.UpdateUserUseCase;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,12 +26,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -40,10 +40,10 @@ import java.util.UUID;
 public class UsersController {
     private final GetUserUseCase getUserUseCase;
     private final AssignRoleUseCase assignRoleUseCase;
-    private final GetAllUsersUseCase getAllUsersUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
     private final BaseService baseService;
+    private final UserService userService;
 
     @GetMapping("/me/")
     @Operation(summary = "Get user", description = "Get the authenticated user's details.")
@@ -94,7 +94,12 @@ public class UsersController {
 
         UserEntity user = getUserUseCase.execute(id);
 
-        return ResponseEntity.ok(new GetUserResponseDTO(user.getId(), user.getName(), user.getEmail()));
+        return ResponseEntity.ok(
+                new SuccessResponseDTO<>(
+                        "User found",
+                        new GetUserResponseDTO(user.getId(),user.getName(),user.getEmail())
+                )
+        );
     }
 
     @Operation(
@@ -160,16 +165,25 @@ public class UsersController {
     @SecurityRequirement(name = "bearer")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/")
-    public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
+    public ResponseEntity<?> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request
+    ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        List<GetAllUsersResponseDTO> users = getAllUsersUseCase.execute();
+        Page<GetAllUsersResponseDTO> usersPage = userService.getAllUsers(page, size);
 
-        if (users == null) {
+        if (usersPage == null) {
             throw new UserNotFoundException();
         }
 
-        return ResponseEntity.ok(users);
+        return ResponseEntity.ok(
+                new SuccessResponseDTO<>(
+                        "Users found",
+                        usersPage
+                )
+        );
     }
 
     @PutMapping("/me/")
@@ -263,11 +277,11 @@ public class UsersController {
                         registerRequestDTO.password(),
                         null));
         return ResponseEntity.ok(
-                new GetUserResponseDTO(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail()
-                ));
+                new SuccessResponseDTO<>(
+                        "User updated",
+                        new GetUserResponseDTO(user.getId(),user.getName(),user.getEmail())
+                )
+        );
     }
 
     @Operation(
@@ -354,7 +368,11 @@ public class UsersController {
 
         deleteUserUseCase.execute(uuid);
 
-        return ResponseEntity.ok("User deleted");
+        return ResponseEntity.ok(
+                new SuccessResponseDTO<>(
+                        "User deleted"
+                )
+        );
     }
 
     @Operation(
@@ -444,7 +462,11 @@ public class UsersController {
 
         UserEntity updatedUser = assignRoleUseCase.execute(assignRoleRequestDTO, uuid);
 
-        return ResponseEntity.ok(updatedUser);
-
+        return ResponseEntity.ok(
+                new SuccessResponseDTO<>(
+                        "Role assigned successfully",
+                        new GetUserResponseDTO(updatedUser.getId(),updatedUser.getName(),updatedUser.getEmail())
+                )
+        );
     }
 }

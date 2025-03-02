@@ -29,7 +29,7 @@ public class ExceptionHandlerController {
         e.getBindingResult().getFieldErrors().forEach(err -> {
             String message = messageSource.getMessage(err, LocaleContextHolder.getLocale());
 
-            dto.add(new ErrorMessageDTO(message, err.getField()));
+            dto.add(new ErrorMessageDTO(message,null, err.getField()));
         });
 
         return new ResponseEntity<>(dto, HttpStatus.UNPROCESSABLE_ENTITY);
