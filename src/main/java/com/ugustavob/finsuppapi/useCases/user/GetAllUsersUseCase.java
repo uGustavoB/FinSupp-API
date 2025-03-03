@@ -2,7 +2,7 @@ package com.ugustavob.finsuppapi.useCases.user;
 
 import com.ugustavob.finsuppapi.dto.users.GetAllUsersResponseDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.repositories.user.UserRepository;
+import com.ugustavob.finsuppapi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -5,7 +5,7 @@ import com.ugustavob.finsuppapi.dto.accounts.AccountResponseDTO;
 import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.repositories.account.AccountRepository;
+import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.services.AccountService;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.UserService;

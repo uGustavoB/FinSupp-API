@@ -4,7 +4,7 @@ import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.AccountAlreadyExistsException;
-import com.ugustavob.finsuppapi.repositories.account.AccountRepository;
+import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,14 +16,14 @@ import java.util.Optional;
 public class CreateAccountUseCase {
     private final AccountRepository accountRepository;
 
-    public AccountEntity execute(@Valid CreateAccountRequestDTO createAccountRequestDTO, UserEntity userId) {
+    public AccountEntity execute(@Valid CreateAccountRequestDTO createAccountRequestDTO, UserEntity userEntity) {
         Optional<AccountEntity> account = accountRepository.findByDescription(createAccountRequestDTO.description());
 
         if (account.isEmpty()) {
             AccountEntity newAccount = new AccountEntity();
             newAccount.setDescription(createAccountRequestDTO.description());
             newAccount.setBank(createAccountRequestDTO.bank());
-            newAccount.setUser(userId);
+            newAccount.setUser(userEntity);
             newAccount.setBalance(0);
             newAccount.setAccountType(createAccountRequestDTO.accountType());
 

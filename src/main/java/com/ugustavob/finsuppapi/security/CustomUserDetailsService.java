@@ -1,7 +1,7 @@
 package com.ugustavob.finsuppapi.security;
 
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.repositories.user.UserRepository;
+import com.ugustavob.finsuppapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

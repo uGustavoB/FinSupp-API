@@ -3,7 +3,7 @@ package com.ugustavob.finsuppapi.useCases.user;
 import com.ugustavob.finsuppapi.dto.users.LoginRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.InvalidCredentialsException;
-import com.ugustavob.finsuppapi.repositories.user.UserRepository;
+import com.ugustavob.finsuppapi.repositories.UserRepository;
 import com.ugustavob.finsuppapi.security.TokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

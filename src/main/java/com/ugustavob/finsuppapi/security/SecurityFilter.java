@@ -1,7 +1,7 @@
 package com.ugustavob.finsuppapi.security;
 
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.repositories.user.UserRepository;
+import com.ugustavob.finsuppapi.repositories.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

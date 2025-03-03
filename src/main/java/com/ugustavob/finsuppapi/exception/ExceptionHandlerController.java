@@ -75,6 +75,19 @@ public class ExceptionHandlerController {
                 HttpStatus.NOT_FOUND);
     }
 
+//  Category Exceptions
+    @ExceptionHandler(CategoryDescriptionAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCategoryDescriptionAlreadyExistsException(CategoryDescriptionAlreadyExistsException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).field("Description").build(),
+                HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCategoryNotFoundException(CategoryNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponseDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getLocalizedMessage()).build(),

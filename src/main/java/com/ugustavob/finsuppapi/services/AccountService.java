@@ -5,8 +5,8 @@ import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.AccountNotFoundException;
 import com.ugustavob.finsuppapi.exception.UserNotFoundException;
-import com.ugustavob.finsuppapi.repositories.account.AccountRepository;
-import com.ugustavob.finsuppapi.repositories.user.UserRepository;
+import com.ugustavob.finsuppapi.repositories.AccountRepository;
+import com.ugustavob.finsuppapi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

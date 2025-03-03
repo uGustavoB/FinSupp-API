@@ -3,7 +3,7 @@ package com.ugustavob.finsuppapi.services;
 import com.ugustavob.finsuppapi.dto.users.GetAllUsersResponseDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.UserNotFoundException;
-import com.ugustavob.finsuppapi.repositories.user.UserRepository;
+import com.ugustavob.finsuppapi.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

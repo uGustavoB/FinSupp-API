@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.repositories.account;
+package com.ugustavob.finsuppapi.repositories;
 
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import jakarta.validation.constraints.NotBlank;

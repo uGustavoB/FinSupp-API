@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.repositories.user;
+package com.ugustavob.finsuppapi.repositories;
 
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
