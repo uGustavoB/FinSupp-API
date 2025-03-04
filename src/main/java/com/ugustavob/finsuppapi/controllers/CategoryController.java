@@ -5,7 +5,6 @@ import com.ugustavob.finsuppapi.dto.categories.CategoryResponseDTO;
 import com.ugustavob.finsuppapi.dto.categories.CreateCategoryRequestDTO;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.exception.CategoryNotFoundException;
-import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.CategoryService;
 import com.ugustavob.finsuppapi.useCases.category.CreateCategoryUseCase;
