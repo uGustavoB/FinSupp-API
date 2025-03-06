@@ -1,13 +1,11 @@
 package com.ugustavob.finsuppapi.dto.transactions;
 
-import com.ugustavob.finsuppapi.entities.account.AccountEntity;
-import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public record CreateTransactionRequestDTO(
@@ -17,10 +15,10 @@ public record CreateTransactionRequestDTO(
         @NotNull(message = "Transaction amount is required")
         @Schema(description = "Amount of the transaction", example = "1000.00")
         Double amount,
-        @Schema(description = "Date and time of the transaction", example = "2021-10-10T10:00:00")
-        LocalDateTime createdAt,
+        @Schema(description = "Date and time of the transaction", example = "2021-10-10")
+        LocalDate transactionDate,
         @NotNull(message = "Transaction type is required")
-        @Schema(description = "Type of the transaction", example = "DEBIT")
+        @Schema(description = "Type of the transaction", example = "WITHDRAW")
         TransactionType type,
         @NotNull(message = "Transaction category is required")
         @Schema(description = "Category of the transaction", example = "1")

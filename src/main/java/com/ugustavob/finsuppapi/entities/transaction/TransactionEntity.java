@@ -2,7 +2,6 @@ package com.ugustavob.finsuppapi.entities.transaction;
 
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
-import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "transactions")
@@ -30,8 +29,8 @@ public class TransactionEntity {
     @Column(nullable = false)
     private double amount;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "transaction_date", nullable = false)
+    private LocalDate transactionDate;
 
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
@@ -47,7 +46,7 @@ public class TransactionEntity {
     private AccountEntity account;
 
     @ManyToOne()
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "recipient_id")
     private AccountEntity recipientAccount;
 }

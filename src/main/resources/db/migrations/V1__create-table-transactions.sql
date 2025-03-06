@@ -6,7 +6,7 @@ CREATE TABLE transactions
     category_id      INT            NOT NULL,
     transaction_type VARCHAR(20)    NOT NULL,
     amount           DECIMAL(15, 2) NOT NULL CHECK (amount > 0),
-    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_date DATE           NOT NULL,
     description      VARCHAR(255),
 
     CONSTRAINT fk_account FOREIGN KEY (account_id)

@@ -19,7 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -80,7 +82,13 @@ public class AccountController {
 
         AccountEntity accountEntity = createAccountUseCase.execute(createAccountRequestDTO, userEntity);
 
-        return ResponseEntity.created(null).body(new SuccessResponseDTO<>(
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("{id}")
+                .buildAndExpand(accountEntity.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(new SuccessResponseDTO<>(
                 "Account created",
                 accountService.entityToResponseDto(accountEntity)
         ));
