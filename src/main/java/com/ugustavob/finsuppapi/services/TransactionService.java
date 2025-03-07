@@ -6,6 +6,7 @@ import com.ugustavob.finsuppapi.entities.TransactionEntityFinder;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
+import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
 import com.ugustavob.finsuppapi.exception.AccountNotFoundException;
 import com.ugustavob.finsuppapi.exception.CategoryNotFoundException;
 import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
@@ -31,6 +32,11 @@ public class TransactionService {
         return transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
     }
 
+    public TransactionEntityFinder getAndValidateTransactionEntities(AccountEntity originAccount,
+                                                                     AccountEntity recipientAccount) {
+        return new TransactionEntityFinder(originAccount, recipientAccount);
+    }
+
     public TransactionEntityFinder getAndValidateTransactionEntities(CreateTransactionRequestDTO createTransactionRequestDTO) {
         AccountEntity account = accountRepository.findById(createTransactionRequestDTO.accountUuid())
                 .orElseThrow(AccountNotFoundException::new);
@@ -39,7 +45,7 @@ public class TransactionService {
 
         if (createTransactionRequestDTO.recipientAccountUuid() != null) {
             recipientAccount = accountRepository.findById(createTransactionRequestDTO.recipientAccountUuid())
-                    .orElseThrow(AccountNotFoundException::new);
+                    .orElseThrow(() -> new AccountNotFoundException("Recipient account not found"));
         }
 
         CategoryEntity category = categoryRepository.findById(createTransactionRequestDTO.category())
@@ -58,7 +64,6 @@ public class TransactionService {
         newTransaction.setAccount(transactionEntityFinder.getAccount());
         newTransaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
 
-        System.out.println("TransactionDate " + newTransaction.getTransactionDate());
         return newTransaction;
     }
 
@@ -80,5 +85,54 @@ public class TransactionService {
                 transaction.getAccount().getId(),
                 transaction.getRecipientAccount() != null ? transaction.getRecipientAccount().getId() : null
         );
+    }
+
+    public TransactionEntityFinder updateAccountBalance(
+            TransactionEntity transaction,
+            TransactionEntityFinder transactionEntityFinder
+    ) {
+
+        switch (transaction.getTransactionType()) {
+            case DEPOSIT:
+                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
+                break;
+            case WITHDRAW:
+                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() - transaction.getAmount());
+                break;
+            case TRANSFER:
+                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() - transaction.getAmount());
+                transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() + transaction.getAmount());
+                break;
+        }
+        return transactionEntityFinder;
+    }
+
+    public TransactionEntityFinder revertAccountBalance(
+            TransactionEntity transaction,
+            TransactionEntityFinder transactionEntityFinder
+    ) {
+
+        switch (transaction.getTransactionType()) {
+            case DEPOSIT:
+                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() - transaction.getAmount());
+                break;
+            case WITHDRAW:
+                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
+                break;
+            case TRANSFER:
+                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
+                transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() - transaction.getAmount());
+                break;
+        }
+
+        return transactionEntityFinder;
+    }
+
+    public void saveAccounts(TransactionEntityFinder transactionEntityFinder, TransactionType type) {
+        accountRepository.save(transactionEntityFinder.getAccount());
+
+        if (type == TransactionType.TRANSFER) {
+            accountRepository.save(transactionEntityFinder.getRecipientAccount());
+        }
     }
 }

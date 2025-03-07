@@ -95,6 +95,12 @@ public class ExceptionHandlerController {
                 HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponseDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getLocalizedMessage()).build(),

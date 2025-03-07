@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Check;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "transactions")
+@Check(constraints = "amount > 0")
 @Getter
 @Setter
 @AllArgsConstructor
