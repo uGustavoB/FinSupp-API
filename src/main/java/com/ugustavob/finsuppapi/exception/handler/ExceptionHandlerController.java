@@ -1,6 +1,7 @@
-package com.ugustavob.finsuppapi.exception;
+package com.ugustavob.finsuppapi.exception.handler;
 
 import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
+import com.ugustavob.finsuppapi.exception.*;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;

@@ -46,6 +46,10 @@ public class TransactionService {
         if (createTransactionRequestDTO.recipientAccountUuid() != null) {
             recipientAccount = accountRepository.findById(createTransactionRequestDTO.recipientAccountUuid())
                     .orElseThrow(() -> new AccountNotFoundException("Recipient account not found"));
+
+            if (createTransactionRequestDTO.recipientAccountUuid().equals(account.getId())) {
+                throw new IllegalArgumentException("You can't transfer to the same account");
+            }
         }
 
         CategoryEntity category = categoryRepository.findById(createTransactionRequestDTO.category())
@@ -121,7 +125,10 @@ public class TransactionService {
                 break;
             case TRANSFER:
                 transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
-                transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() - transaction.getAmount());
+                if (transaction.getRecipientAccount() != null) {
+                    transactionEntityFinder.setRecipientAccount(transaction.getRecipientAccount());
+                    transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() - transaction.getAmount());
+                }
                 break;
         }
 

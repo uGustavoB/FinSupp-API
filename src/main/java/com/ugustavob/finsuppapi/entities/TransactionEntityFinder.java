@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TransactionEntityFinder {
     private final AccountEntity account;
-    private final AccountEntity recipientAccount;
+    private AccountEntity recipientAccount;
     private final CategoryEntity category;
 
     public TransactionEntityFinder(AccountEntity account, AccountEntity recipientAccount) {

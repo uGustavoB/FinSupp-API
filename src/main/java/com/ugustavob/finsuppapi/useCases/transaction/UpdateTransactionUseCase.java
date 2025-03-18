@@ -21,13 +21,7 @@ public class UpdateTransactionUseCase {
 
         TransactionEntityFinder transactionEntityFinder = transactionService.getAndValidateTransactionEntities(createTransactionRequestDTO);
 
-        System.out.println("Conta origem: " + transactionEntityFinder.getAccount().getBalance());
-        System.out.println("Conta destino: " + transactionEntityFinder.getRecipientAccount().getBalance());
-
         transactionEntityFinder = transactionService.revertAccountBalance(transaction, transactionEntityFinder);
-
-        System.out.println("Conta origem pós reversão: " + transactionEntityFinder.getAccount().getBalance());
-        System.out.println("Conta destino pós reversão: " + transactionEntityFinder.getRecipientAccount().getBalance());
 
         transaction.setDescription(createTransactionRequestDTO.description());
         transaction.setAmount(createTransactionRequestDTO.amount());
@@ -40,9 +34,6 @@ public class UpdateTransactionUseCase {
         TransactionType type = createTransactionRequestDTO.type();
 
         transactionEntityFinder = transactionService.updateAccountBalance(transaction, transactionEntityFinder);
-
-        System.out.println("Conta origem pós aplicação nova: " + transactionEntityFinder.getAccount().getBalance());
-        System.out.println("Conta destino pós aplicação nova: " + transactionEntityFinder.getRecipientAccount().getBalance());
 
         transactionService.saveAccounts(transactionEntityFinder, type);
 

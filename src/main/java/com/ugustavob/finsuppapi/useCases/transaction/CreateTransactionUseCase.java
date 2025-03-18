@@ -27,10 +27,6 @@ public class CreateTransactionUseCase {
         Double accountBalance = transactionEntityFinder.getAccount().getBalance();
         Double transactionAmount = createTransactionRequestDTO.amount();
 
-        if (transactionAmount <=  0) {
-            throw new IllegalArgumentException("Amount must be greater than 0");
-        }
-
         if (type == TransactionType.TRANSFER && accountBalance.compareTo(transactionAmount) < 0) {
             throw new IllegalArgumentException("Insufficient funds");
         }
