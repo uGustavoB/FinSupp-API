@@ -10,6 +10,7 @@ import com.ugustavob.finsuppapi.useCases.transaction.CreateTransactionUseCase;
 import com.ugustavob.finsuppapi.useCases.transaction.DeleteTransactionUseCase;
 import com.ugustavob.finsuppapi.useCases.transaction.UpdateTransactionUseCase;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/transactions")
+@Tag(name = "Transactions", description = "Endpoints for transactions management")
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
@@ -48,6 +50,20 @@ public class TransactionController {
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Transactions retrieved",
                 transactions
+        ));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @SecurityRequirement(name = "bearer")
+    public ResponseEntity<?> getTransactionById(@PathVariable int id, HttpServletRequest request) {
+        baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+
+        TransactionEntity transaction = transactionService.getTransactionById(id);
+
+        return ResponseEntity.ok(new SuccessResponseDTO<>(
+                "Transaction retrieved",
+                transactionService.entityToResponseDto(transaction)
         ));
     }
 

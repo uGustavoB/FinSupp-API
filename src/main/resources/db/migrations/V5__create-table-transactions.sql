@@ -16,5 +16,5 @@ CREATE TABLE transactions
         REFERENCES accounts (id) ON DELETE SET NULL,
 
     CONSTRAINT fk_transactions_category FOREIGN KEY (category_id)
-        REFERENCES categories (id) ON DELETE CASCADE
+        REFERENCES categories (id) ON DELETE SET NULL
 );

@@ -1,4 +1,4 @@
-package com.ugustavob.finsuppapi.entities;
+package com.ugustavob.finsuppapi.entities.transaction;
 
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;

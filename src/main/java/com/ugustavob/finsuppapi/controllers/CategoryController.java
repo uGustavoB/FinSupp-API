@@ -11,6 +11,7 @@ import com.ugustavob.finsuppapi.useCases.category.CreateCategoryUseCase;
 import com.ugustavob.finsuppapi.useCases.category.DeleteCategoryUseCase;
 import com.ugustavob.finsuppapi.useCases.category.UpdateCategoryUseCase;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
+@Tag(name = "Categories", description = "Endpoints for categories management")
 @RequestMapping("/categories")
 public class CategoryController {
     private final CreateCategoryUseCase createCategoryUseCase;

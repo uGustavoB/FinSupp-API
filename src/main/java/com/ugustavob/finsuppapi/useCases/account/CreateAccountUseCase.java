@@ -24,7 +24,11 @@ public class CreateAccountUseCase {
             newAccount.setDescription(createAccountRequestDTO.description());
             newAccount.setBank(createAccountRequestDTO.bank());
             newAccount.setUser(userEntity);
-            newAccount.setBalance(0);
+            if (createAccountRequestDTO.balance() != null) {
+                newAccount.setBalance(createAccountRequestDTO.balance());
+            } else {
+                newAccount.setBalance(0.0);
+            }
             newAccount.setAccountType(createAccountRequestDTO.accountType());
 
             return accountRepository.save(newAccount);

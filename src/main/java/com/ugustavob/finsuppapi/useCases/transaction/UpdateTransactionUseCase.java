@@ -1,7 +1,7 @@
 package com.ugustavob.finsuppapi.useCases.transaction;
 
 import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
-import com.ugustavob.finsuppapi.entities.TransactionEntityFinder;
+import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
 import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
