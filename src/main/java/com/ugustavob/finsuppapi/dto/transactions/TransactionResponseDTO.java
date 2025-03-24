@@ -9,6 +9,8 @@ public record TransactionResponseDTO(
         Integer id,
         String description,
         Double amount,
+        Integer installments,
+        Boolean addToBill,
         LocalDate transactionDate,
         TransactionType type,
         Integer category,

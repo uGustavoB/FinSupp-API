@@ -9,6 +9,8 @@ public record AccountResponseDTO(
         String description,
         String bank,
         AccountType accountType,
+        int closingDay,
+        int paymentDueDay,
         double balance
 ) {
 }

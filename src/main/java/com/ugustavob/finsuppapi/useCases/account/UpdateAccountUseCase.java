@@ -2,6 +2,7 @@ package com.ugustavob.finsuppapi.useCases.account;
 
 import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
+import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.exception.AccountAlreadyExistsException;
 import com.ugustavob.finsuppapi.exception.AccountNotFoundException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
@@ -34,6 +35,11 @@ public class UpdateAccountUseCase {
 
         if (createAccountRequestDTO.balance() != null) {
             account.setBalance(createAccountRequestDTO.balance());
+        }
+
+        if (account.getAccountType() != AccountType.CREDIT) {
+            account.setClosingDay(createAccountRequestDTO.closingDay());
+            account.setPaymentDueDay(createAccountRequestDTO.paymentDueDay());
         }
 
         return accountRepository.save(account);

@@ -1,0 +1,72 @@
+package com.ugustavob.finsuppapi.services;
+
+import com.ugustavob.finsuppapi.entities.account.AccountEntity;
+import com.ugustavob.finsuppapi.entities.account.AccountType;
+import com.ugustavob.finsuppapi.entities.bill.BillEntity;
+import com.ugustavob.finsuppapi.entities.bill.BillItemEntity;
+import com.ugustavob.finsuppapi.entities.bill.BillStatus;
+import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
+import com.ugustavob.finsuppapi.repositories.BillItemRepository;
+import com.ugustavob.finsuppapi.repositories.BillRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class BillService {
+    private final BillRepository billRepository;
+    private final BillItemRepository billItemRepository;
+
+    public BillEntity findOrCreateBill(AccountEntity account, LocalDate transactionDate) {
+        int closingDay = account.getClosingDay();
+        LocalDate startDate = transactionDate.withDayOfMonth(closingDay).plusDays(1);
+        LocalDate endDate = startDate.plusMonths(1).withDayOfMonth(closingDay);
+        LocalDate dueDate = endDate.withDayOfMonth(10);
+
+        BillEntity bill = billRepository.findByAccountAndDateRange(account, startDate, endDate);
+
+        if (bill == null) {
+            bill = new BillEntity();
+            bill.setAccount(account);
+            bill.setStartDate(startDate);
+            bill.setEndDate(endDate);
+            bill.setDueDate(dueDate);
+            bill.setTotalAmount(0.0);
+            bill.setStatus(BillStatus.OPEN);
+
+            billRepository.save(bill);
+        }
+
+        return bill;
+    }
+
+    public void addTransactionToBill(TransactionEntity transaction) {
+        if (transaction.isAddToBill() && transaction.getAccount().getAccountType() == AccountType.CREDIT) {
+            AccountEntity account = transaction.getAccount();
+            LocalDate dueDate = transaction.getTransactionDate();
+
+            int installments = transaction.getInstallments();
+            double installmentValue = transaction.getAmount() / installments;
+
+            for (int i = 0; i < installments; i++) {
+                LocalDate installmentDate = dueDate.plusMonths(i);
+
+                BillEntity bill = findOrCreateBill(account, installmentDate);
+
+                BillItemEntity billItem = new BillItemEntity();
+                billItem.setBill(bill);
+                billItem.setTransaction(transaction);
+                billItem.setInstallmentNumber(i + 1);
+                billItem.setAmount(installmentValue);
+
+                bill.setTotalAmount(bill.getTotalAmount() + installmentValue);
+
+                billItemRepository.save(billItem);
+                billRepository.save(bill);
+            }
+        }
+    }
+}

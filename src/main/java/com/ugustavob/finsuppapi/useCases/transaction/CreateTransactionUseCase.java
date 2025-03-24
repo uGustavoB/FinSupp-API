@@ -5,6 +5,7 @@ import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
+import com.ugustavob.finsuppapi.services.BillService;
 import com.ugustavob.finsuppapi.services.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 public class CreateTransactionUseCase {
     private final TransactionRepository transactionRepository;
     private final TransactionService transactionService;
+    private final BillService billService;
 
     public TransactionEntity execute(@Valid CreateTransactionRequestDTO createTransactionRequestDTO) {
         TransactionEntityFinder transactionEntityFinder = transactionService.getAndValidateTransactionEntities(createTransactionRequestDTO);
@@ -33,6 +35,10 @@ public class CreateTransactionUseCase {
        transactionEntityFinder = transactionService.updateAccountBalance(newTransaction, transactionEntityFinder);
        transactionService.saveAccounts(transactionEntityFinder, type);
 
-        return transactionRepository.save(newTransaction);
+        TransactionEntity transaction =  transactionRepository.save(newTransaction);
+
+        billService.addTransactionToBill(transaction);
+
+        return transaction;
     }
 }

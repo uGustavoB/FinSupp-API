@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -28,6 +29,9 @@ public class AccountEntity {
 
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
+
+    private int closingDay;
+    private int paymentDueDay;
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)

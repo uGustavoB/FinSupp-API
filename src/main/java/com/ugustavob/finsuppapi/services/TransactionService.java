@@ -67,6 +67,11 @@ public class TransactionService {
         newTransaction.setCategory(transactionEntityFinder.getCategory());
         newTransaction.setAccount(transactionEntityFinder.getAccount());
         newTransaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
+        newTransaction.setAddToBill(createTransactionRequestDTO.addToBill());
+
+        if (createTransactionRequestDTO.addToBill() && createTransactionRequestDTO.installments() != null) {
+            newTransaction.setInstallments(createTransactionRequestDTO.installments());
+        }
 
         return newTransaction;
     }
@@ -83,6 +88,8 @@ public class TransactionService {
                 transaction.getId(),
                 transaction.getDescription(),
                 transaction.getAmount(),
+                transaction.getInstallments(),
+                transaction.isAddToBill(),
                 transaction.getTransactionDate(),
                 transaction.getTransactionType(),
                 transaction.getCategory().getId(),

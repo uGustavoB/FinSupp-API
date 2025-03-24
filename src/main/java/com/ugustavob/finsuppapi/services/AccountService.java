@@ -41,6 +41,8 @@ public class AccountService {
                 accountEntity.getDescription(),
                 accountEntity.getBank(),
                 accountEntity.getAccountType(),
+                accountEntity.getClosingDay(),
+                accountEntity.getPaymentDueDay(),
                 accountEntity.getBalance()
         );
     }
