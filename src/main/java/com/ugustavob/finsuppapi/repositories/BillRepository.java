@@ -2,6 +2,7 @@ package com.ugustavob.finsuppapi.repositories;
 
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
+import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,7 +27,17 @@ public interface BillRepository extends JpaRepository<BillEntity, Integer> {
     BillEntity findByAccountAndDateRange(@Param("account") AccountEntity account,
                                                            @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
+    @Query("SELECT b FROM BillEntity b WHERE b.status = :status AND b.endDate <= :today")
+    Page<BillEntity> findBillsToClose(
+            @Param("status") BillStatus status,
+            @Param("today") LocalDate today,
+            Pageable pageable);
 
+    @Query("SELECT b FROM BillEntity b WHERE b.status = 'CLOSED' AND b.dueDate < :today")
+    Page<BillEntity> findOverdueBills(
+            @Param("today") LocalDate today,
+            Pageable pageable
+    );
 
     default Optional<BillEntity> deleteByIdAndReturnEntity(Integer id) {
         Optional<BillEntity> bill = findById(id);
