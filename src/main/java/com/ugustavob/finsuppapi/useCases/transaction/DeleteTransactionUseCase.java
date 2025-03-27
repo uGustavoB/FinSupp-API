@@ -5,6 +5,7 @@ import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
+import com.ugustavob.finsuppapi.services.BillService;
 import com.ugustavob.finsuppapi.services.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class DeleteTransactionUseCase {
     private final TransactionRepository transactionRepository;
     private final TransactionService transactionService;
-    private final AccountRepository accountRepository;
+    private final BillService billService;
 
     public void execute(Integer id) {
-        TransactionEntity transaction = transactionRepository.deleteByIdAndReturnEntity(id).orElseThrow(TransactionNotFoundException::new);
+        TransactionEntity transaction = transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
+        billService.revertTransactionBills(transaction);
+        transactionRepository.delete(transaction);
 
         TransactionEntityFinder transactionEntityFinder =
                 transactionService.getAndValidateTransactionEntities(transaction.getAccount(), transaction.getRecipientAccount());

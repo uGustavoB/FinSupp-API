@@ -26,6 +26,8 @@ public interface BillRepository extends JpaRepository<BillEntity, Integer> {
     BillEntity findByAccountAndDateRange(@Param("account") AccountEntity account,
                                                            @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
+
+
     default Optional<BillEntity> deleteByIdAndReturnEntity(Integer id) {
         Optional<BillEntity> bill = findById(id);
 

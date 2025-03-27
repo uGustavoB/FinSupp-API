@@ -8,10 +8,14 @@ import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.repositories.BillItemRepository;
 import com.ugustavob.finsuppapi.repositories.BillRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -43,6 +47,7 @@ public class BillService {
         return bill;
     }
 
+    @Transactional
     public void addTransactionToBill(TransactionEntity transaction) {
         if (transaction.isAddToBill() && transaction.getAccount().getAccountType() == AccountType.CREDIT) {
             AccountEntity account = transaction.getAccount();
@@ -65,6 +70,25 @@ public class BillService {
                 bill.setTotalAmount(bill.getTotalAmount() + installmentValue);
 
                 billItemRepository.save(billItem);
+                billRepository.save(bill);
+            }
+        }
+    }
+
+    @Transactional
+    public void revertTransactionBills(TransactionEntity transaction) {
+        List<BillItemEntity> bills = billItemRepository.findByTransaction(transaction);
+
+        for (BillItemEntity billItem : new ArrayList<>(bills)) {
+            BillEntity bill = billItem.getBill();
+
+            billItemRepository.delete(billItem);
+
+            bill.setTotalAmount(bill.getTotalAmount() - billItem.getAmount());
+
+            if (bill.getTotalAmount() == 0) {
+                billRepository.delete(bill);
+            } else {
                 billRepository.save(bill);
             }
         }
