@@ -6,6 +6,7 @@ import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -13,11 +14,11 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface BillRepository extends JpaRepository<BillEntity, Integer> {
+public interface BillRepository extends JpaRepository<BillEntity, Integer>, JpaSpecificationExecutor<BillEntity> {
     Optional<BillEntity> findById(Integer id);
 
     @Query("SELECT b FROM BillEntity b WHERE b.account.user.id = :userId")
-    Page<BillEntity> findByUserId(@Param("userId") UUID userId, Pageable pageable);
+    Page<BillEntity> findAllByUserId(@Param("userId") UUID userId, Pageable pageable);
 
     @Query("SELECT b FROM BillEntity b WHERE b.account.user.id = :userId")
     Optional<BillEntity> findByUserId(@Param("userId") UUID userId);
