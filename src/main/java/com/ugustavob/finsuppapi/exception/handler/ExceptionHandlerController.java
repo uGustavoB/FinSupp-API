@@ -2,6 +2,7 @@ package com.ugustavob.finsuppapi.exception.handler;
 
 import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.exception.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @ControllerAdvice
 public class ExceptionHandlerController {
 
@@ -67,7 +69,7 @@ public class ExceptionHandlerController {
 //  Account Exceptions
     @ExceptionHandler(AccountAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccountAlreadyExistsException(AccountAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
@@ -96,8 +98,27 @@ public class ExceptionHandlerController {
                 HttpStatus.NOT_FOUND);
     }
 
+//  Bill Exceptions
+    @ExceptionHandler(BillNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBillNotFoundException(BillNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(BillAreadyPaidException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBillAreadyPaidException(BillAreadyPaidException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleIllegalStateException(IllegalStateException e) {
         return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
                 HttpStatus.BAD_REQUEST);
     }
@@ -116,6 +137,7 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponseDTO.builder().message(e.getMessage()).build().toString());
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
     }
 }

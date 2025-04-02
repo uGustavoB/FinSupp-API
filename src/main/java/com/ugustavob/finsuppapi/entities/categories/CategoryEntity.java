@@ -17,4 +17,8 @@ public class CategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String description;
+
+    public CategoryEntity(String description) {
+        this.description = description;
+    }
 }

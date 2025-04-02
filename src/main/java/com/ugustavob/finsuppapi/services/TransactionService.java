@@ -2,6 +2,9 @@ package com.ugustavob.finsuppapi.services;
 
 import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
+import com.ugustavob.finsuppapi.entities.account.AccountType;
+import com.ugustavob.finsuppapi.entities.bill.BillEntity;
+import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
@@ -13,12 +16,14 @@ import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -27,6 +32,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
+    private final BillService billService;
 
     public TransactionEntity getTransactionById(int id) {
         return transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
@@ -98,6 +104,7 @@ public class TransactionService {
         );
     }
 
+    @Transactional
     public TransactionEntityFinder updateAccountBalance(
             TransactionEntity transaction,
             TransactionEntityFinder transactionEntityFinder
@@ -118,6 +125,7 @@ public class TransactionService {
         return transactionEntityFinder;
     }
 
+    @Transactional
     public TransactionEntityFinder revertAccountBalance(
             TransactionEntity transaction,
             TransactionEntityFinder transactionEntityFinder
@@ -140,6 +148,34 @@ public class TransactionService {
         }
 
         return transactionEntityFinder;
+    }
+
+    @Transactional
+    public BillEntity billPaymentTransaction(BillEntity bill, AccountEntity account) {
+        if (account.getAccountType() == AccountType.CREDIT || account.getAccountType() == AccountType.SAVINGS) {
+            throw new IllegalArgumentException("You can't pay a bill with this account type");
+        }
+
+        CategoryEntity category = categoryRepository.findByDescription("Bill Payments")
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
+
+        TransactionEntity transaction = new TransactionEntity();
+        transaction.setDescription("Bill payment");
+        transaction.setAmount(bill.getTotalAmount());
+        transaction.setTransactionType(TransactionType.WITHDRAW);
+        transaction.setAccount(account);
+        transaction.setAddToBill(false);
+        transaction.setTransactionDate(LocalDate.now());
+        transaction.setCategory(category);
+        transaction.setRecipientAccount(null);
+        transaction.setInstallments(1);
+
+        transactionRepository.save(transaction);
+
+        account.setBalance(account.getBalance() - bill.getTotalAmount());
+        accountRepository.save(transaction.getAccount());
+
+        return billService.payBill(bill, transaction);
     }
 
     public void saveAccounts(TransactionEntityFinder transactionEntityFinder, TransactionType type) {

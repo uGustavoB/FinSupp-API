@@ -1,7 +1,9 @@
 package com.ugustavob.finsuppapi.services;
 
 import com.ugustavob.finsuppapi.dto.bills.BillFilterDTO;
+import com.ugustavob.finsuppapi.dto.bills.BillItemResponseDTO;
 import com.ugustavob.finsuppapi.dto.bills.BillResponseDTO;
+import com.ugustavob.finsuppapi.dto.bills.BillPayRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
@@ -13,6 +15,8 @@ import com.ugustavob.finsuppapi.repositories.BillItemRepository;
 import com.ugustavob.finsuppapi.repositories.BillRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +39,16 @@ public class BillService {
                 bill.getStartDate(),
                 bill.getEndDate(),
                 bill.getDueDate()
+        );
+    }
+
+    public BillItemResponseDTO billItemEntityToResponseDto(BillItemEntity billItem) {
+        return new BillItemResponseDTO(
+                billItem.getId(),
+                billItem.getAmount(),
+                billItem.getInstallmentNumber(),
+                billItem.getBill().getId(),
+                billItem.getTransaction().getId()
         );
     }
 
@@ -108,8 +122,31 @@ public class BillService {
         }
     }
 
+    @Transactional
+    public BillEntity payBill(BillEntity bill, TransactionEntity transaction) {
+        if (bill.getStatus() == BillStatus.PAID) {
+            throw new IllegalStateException("Bill is already paid");
+        }
+
+        if (bill.getStatus() == BillStatus.CANCELED) {
+            throw new IllegalStateException("Bill is canceled");
+        }
+
+        bill.setStatus(BillStatus.PAID);
+
+        billRepository.save(bill);
+
+        return bill;
+    }
+
     public List<BillEntity> findAll(BillFilterDTO filter) {
         Specification<BillEntity> specification = BillSpecification.filter(filter);
         return billRepository.findAll(specification);
+    }
+
+    public Page<BillItemResponseDTO> findBillItemsByBill(BillEntity bill, int page, int size) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        Page<BillItemEntity> billItems = billItemRepository.findByBillId(bill.getId(), pageable);
+        return billItems.map(this::billItemEntityToResponseDto);
     }
 }
