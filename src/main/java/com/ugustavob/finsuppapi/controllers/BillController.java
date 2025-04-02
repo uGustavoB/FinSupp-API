@@ -103,7 +103,7 @@ public class BillController {
     ) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        AccountEntity account = accountService.getAccountByIdAndCompareWithUserId(billStatusRequestDTO.accountId(), userId);
+        AccountEntity account = accountService.getAccountByIdAndCompareWithUserId(billStatusRequestDTO.payWithAccount(), userId);
 
         BillEntity bill = billRepository.findById(id).orElseThrow(BillNotFoundException::new);
 

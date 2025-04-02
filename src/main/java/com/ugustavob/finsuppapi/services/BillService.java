@@ -8,6 +8,8 @@ import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
 import com.ugustavob.finsuppapi.entities.bill.BillItemEntity;
+import com.ugustavob.finsuppapi.entities.card.CardEntity;
+import com.ugustavob.finsuppapi.entities.card.CardType;
 import com.ugustavob.finsuppapi.specifications.BillSpecification;
 import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
@@ -31,11 +33,12 @@ public class BillService {
     private final BillItemRepository billItemRepository;
 
     public BillResponseDTO entityToResponseDto(BillEntity bill) {
+        System.out.println("Chegou aqui");
         return new BillResponseDTO(
                 bill.getId(),
                 bill.getStatus(),
                 bill.getTotalAmount(),
-                bill.getAccount().getId(),
+                bill.getCard().getAccount().getId(),
                 bill.getStartDate(),
                 bill.getEndDate(),
                 bill.getDueDate()
@@ -52,7 +55,7 @@ public class BillService {
         );
     }
 
-    public BillEntity findOrCreateBill(AccountEntity account, LocalDate transactionDate) {
+    public BillEntity findOrCreateBill(AccountEntity account, CardEntity card, LocalDate transactionDate) {
         int closingDay = account.getClosingDay();
         LocalDate startDate = transactionDate.withDayOfMonth(closingDay).plusDays(1);
         LocalDate endDate = startDate.plusMonths(1).withDayOfMonth(closingDay);
@@ -62,7 +65,7 @@ public class BillService {
 
         if (bill == null) {
             bill = new BillEntity();
-            bill.setAccount(account);
+            bill.setCard(card);
             bill.setStartDate(startDate);
             bill.setEndDate(endDate);
             bill.setDueDate(dueDate);
@@ -77,8 +80,8 @@ public class BillService {
 
     @Transactional
     public void addTransactionToBill(TransactionEntity transaction) {
-        if (transaction.isAddToBill() && transaction.getAccount().getAccountType() == AccountType.CREDIT) {
-            AccountEntity account = transaction.getAccount();
+        if (transaction.isAddToBill() && transaction.getCard().getType() == CardType.CREDIT) {
+            AccountEntity account = transaction.getCard().getAccount();
             LocalDate dueDate = transaction.getTransactionDate();
 
             int installments = transaction.getInstallments();
@@ -87,7 +90,7 @@ public class BillService {
             for (int i = 0; i < installments; i++) {
                 LocalDate installmentDate = dueDate.plusMonths(i);
 
-                BillEntity bill = findOrCreateBill(account, installmentDate);
+                BillEntity bill = findOrCreateBill(account, transaction.getCard(), installmentDate);
 
                 if (bill.getStatus() != BillStatus.OPEN) {
                     throw new IllegalStateException("Bill is not open");
@@ -134,7 +137,7 @@ public class BillService {
     }
 
     @Transactional
-    public BillEntity payBill(BillEntity bill, TransactionEntity transaction) {
+    public BillEntity payBill(BillEntity bill) {
         if (bill.getStatus() == BillStatus.PAID) {
             throw new IllegalStateException("Bill is already paid");
         }

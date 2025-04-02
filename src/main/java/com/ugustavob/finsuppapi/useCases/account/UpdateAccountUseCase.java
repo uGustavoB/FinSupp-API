@@ -38,10 +38,8 @@ public class UpdateAccountUseCase {
             account.setBalance(createAccountRequestDTO.balance());
         }
 
-        if (account.getAccountType() != AccountType.CREDIT) {
-            account.setClosingDay(createAccountRequestDTO.closingDay());
-            account.setPaymentDueDay(createAccountRequestDTO.paymentDueDay());
-        }
+        account.setClosingDay(createAccountRequestDTO.closingDay());
+        account.setPaymentDueDay(createAccountRequestDTO.paymentDueDay());
 
         return accountRepository.save(account);
     }

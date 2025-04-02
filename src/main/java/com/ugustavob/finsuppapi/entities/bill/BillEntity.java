@@ -1,6 +1,7 @@
 package com.ugustavob.finsuppapi.entities.bill;
 
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
+import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +23,16 @@ public class BillEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+//    @ManyToOne()
+//    @OnDelete(action = OnDeleteAction.CASCADE)
+//    @JoinColumn(name = "account_id", nullable = false)
+//    private AccountEntity account;
+
+//    Many to one card
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "account_id", nullable = false)
-    private AccountEntity account;
+    @JoinColumn(name = "card_id", nullable = false)
+    private CardEntity card;
 
     @Column(nullable = false)
     private LocalDate startDate;

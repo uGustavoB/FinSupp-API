@@ -4,15 +4,19 @@ import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
+import com.ugustavob.finsuppapi.entities.card.CardEntity;
+import com.ugustavob.finsuppapi.entities.card.CardType;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
 import com.ugustavob.finsuppapi.exception.AccountNotFoundException;
+import com.ugustavob.finsuppapi.exception.CardNotFoundException;
 import com.ugustavob.finsuppapi.exception.CategoryNotFoundException;
 import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
+import com.ugustavob.finsuppapi.repositories.CardRepository;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
@@ -24,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,19 +38,20 @@ public class TransactionService {
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
     private final BillService billService;
+    private final CardRepository cardRepository;
 
     public TransactionEntity getTransactionById(int id) {
         return transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
     }
 
-    public TransactionEntityFinder getAndValidateTransactionEntities(AccountEntity originAccount,
+    public TransactionEntityFinder getAndValidateTransactionEntities(CardEntity card,
                                                                      AccountEntity recipientAccount) {
-        return new TransactionEntityFinder(originAccount, recipientAccount);
+        return new TransactionEntityFinder(card, recipientAccount);
     }
 
     public TransactionEntityFinder getAndValidateTransactionEntities(CreateTransactionRequestDTO createTransactionRequestDTO) {
-        AccountEntity account = accountRepository.findById(createTransactionRequestDTO.accountId())
-                .orElseThrow(AccountNotFoundException::new);
+        CardEntity card = cardRepository.findById(createTransactionRequestDTO.cardId())
+                .orElseThrow(CardNotFoundException::new);
 
         AccountEntity recipientAccount = null;
 
@@ -53,25 +59,33 @@ public class TransactionService {
             recipientAccount = accountRepository.findById(createTransactionRequestDTO.recipientAccountId())
                     .orElseThrow(() -> new AccountNotFoundException("Recipient account not found"));
 
-            if (createTransactionRequestDTO.recipientAccountId().equals(account.getId())) {
+            if (createTransactionRequestDTO.recipientAccountId().equals(card.getAccount().getId())) {
                 throw new IllegalArgumentException("You can't transfer to the same account");
             }
+        }
+
+        int installments = createTransactionRequestDTO.installments() == null ? 1 :
+                createTransactionRequestDTO.installments();
+
+        if (card.getType() == CardType.DEBIT && installments >= 2) {
+            throw new IllegalArgumentException("You can't create installments with a debit card");
         }
 
         CategoryEntity category = categoryRepository.findById(createTransactionRequestDTO.category())
                 .orElseThrow(CategoryNotFoundException::new);
 
-        return new TransactionEntityFinder(account, recipientAccount, category);
+        return new TransactionEntityFinder(card, recipientAccount, category);
     }
 
-    public TransactionEntity getTransactionEntity(CreateTransactionRequestDTO createTransactionRequestDTO, TransactionEntityFinder transactionEntityFinder) {
+    public TransactionEntity getTransactionEntity(CreateTransactionRequestDTO createTransactionRequestDTO,
+                                                  TransactionEntityFinder transactionEntityFinder) {
         TransactionEntity newTransaction = new TransactionEntity();
         newTransaction.setDescription(StringFormatUtil.toTitleCase(createTransactionRequestDTO.description()));
         newTransaction.setAmount(createTransactionRequestDTO.amount());
         newTransaction.setTransactionDate(createTransactionRequestDTO.transactionDate());
         newTransaction.setTransactionType(createTransactionRequestDTO.type());
         newTransaction.setCategory(transactionEntityFinder.getCategory());
-        newTransaction.setAccount(transactionEntityFinder.getAccount());
+        newTransaction.setCard(transactionEntityFinder.getCard());
         newTransaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
         newTransaction.setAddToBill(createTransactionRequestDTO.addToBill());
 
@@ -99,7 +113,7 @@ public class TransactionService {
                 transaction.getTransactionDate(),
                 transaction.getTransactionType(),
                 transaction.getCategory().getId(),
-                transaction.getAccount().getId(),
+                transaction.getCard().getId(),
                 transaction.getRecipientAccount() != null ? transaction.getRecipientAccount().getId() : null
         );
     }
@@ -112,14 +126,18 @@ public class TransactionService {
 
         switch (transaction.getTransactionType()) {
             case DEPOSIT:
-                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
+                transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() + transaction.getAmount());
                 break;
             case WITHDRAW:
-                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() - transaction.getAmount());
+                if (transactionEntityFinder.getCard().getType() == CardType.DEBIT) {
+                    transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() - transaction.getAmount());
+                }
                 break;
             case TRANSFER:
-                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() - transaction.getAmount());
-                transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() + transaction.getAmount());
+                if (transactionEntityFinder.getCard().getType() == CardType.DEBIT) {
+                    transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() - transaction.getAmount());
+                    transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() + transaction.getAmount());
+                }
                 break;
         }
         return transactionEntityFinder;
@@ -133,16 +151,21 @@ public class TransactionService {
 
         switch (transaction.getTransactionType()) {
             case DEPOSIT:
-                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() - transaction.getAmount());
+                transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() - transaction.getAmount());
                 break;
             case WITHDRAW:
-                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
+                transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() + transaction.getAmount());
                 break;
             case TRANSFER:
-                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
-                if (transaction.getRecipientAccount() != null) {
-                    transactionEntityFinder.setRecipientAccount(transaction.getRecipientAccount());
-                    transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() - transaction.getAmount());
+                if (transactionEntityFinder.getCard().getType() == CardType.DEBIT) {
+                    transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() + transaction.getAmount());
+                    if (transaction.getRecipientAccount() != null) {
+                        transactionEntityFinder.setRecipientAccount(transaction.getRecipientAccount());
+                        transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() - transaction.getAmount());
+                    }
+                } else {
+//                  Gustavo - Consertar depois, para adicionar o valor na fatura
+                    throw new IllegalArgumentException("You can't transfer with a credit card");
                 }
                 break;
         }
@@ -152,18 +175,18 @@ public class TransactionService {
 
     @Transactional
     public BillEntity billPaymentTransaction(BillEntity bill, AccountEntity account) {
-        if (account.getAccountType() == AccountType.CREDIT || account.getAccountType() == AccountType.SAVINGS) {
-            throw new IllegalArgumentException("You can't pay a bill with this account type");
-        }
-
         CategoryEntity category = categoryRepository.findByDescription("Bill Payments")
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
+
+        CardEntity card =
+                cardRepository.findDebitCardByAccountId(account.getId()).orElseThrow(() -> new CardNotFoundException("Debit " +
+                        "Card not found"));
 
         TransactionEntity transaction = new TransactionEntity();
         transaction.setDescription("Bill payment");
         transaction.setAmount(bill.getTotalAmount());
         transaction.setTransactionType(TransactionType.WITHDRAW);
-        transaction.setAccount(account);
+        transaction.setCard(card);
         transaction.setAddToBill(false);
         transaction.setTransactionDate(LocalDate.now());
         transaction.setCategory(category);
@@ -172,14 +195,14 @@ public class TransactionService {
 
         transactionRepository.save(transaction);
 
-        account.setBalance(account.getBalance() - bill.getTotalAmount());
-        accountRepository.save(transaction.getAccount());
+        card.getAccount().setBalance(account.getBalance() - bill.getTotalAmount());
+        accountRepository.save(card.getAccount());
 
-        return billService.payBill(bill, transaction);
+        return billService.payBill(bill);
     }
 
     public void saveAccounts(TransactionEntityFinder transactionEntityFinder, TransactionType type) {
-        accountRepository.save(transactionEntityFinder.getAccount());
+        accountRepository.save(transactionEntityFinder.getCard().getAccount());
 
         if (type == TransactionType.TRANSFER) {
             accountRepository.save(transactionEntityFinder.getRecipientAccount());

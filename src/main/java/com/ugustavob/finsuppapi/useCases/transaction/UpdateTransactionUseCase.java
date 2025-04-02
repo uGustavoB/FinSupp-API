@@ -32,7 +32,7 @@ public class UpdateTransactionUseCase {
         transaction.setTransactionType(createTransactionRequestDTO.type());
         transaction.setTransactionDate(createTransactionRequestDTO.transactionDate());
         transaction.setCategory(transactionEntityFinder.getCategory());
-        transaction.setAccount(transactionEntityFinder.getAccount());
+        transaction.setCard(transactionEntityFinder.getCard());
         transaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
         transaction.setAddToBill(createTransactionRequestDTO.addToBill());
 

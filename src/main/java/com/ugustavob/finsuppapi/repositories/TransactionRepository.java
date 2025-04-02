@@ -24,9 +24,9 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         return Optional.empty();
     }
 
-    @Query("SELECT t FROM TransactionEntity t WHERE t.account.user.id = :userId")
+    @Query("SELECT t FROM TransactionEntity t WHERE t.card.account.user.id = :userId")
     Page<TransactionEntity> findByUserId(@Param("userId") UUID userId, Pageable pageable);
 
-    @Query("SELECT t FROM TransactionEntity t WHERE t.account.user.id = :userId")
+    @Query("SELECT t FROM TransactionEntity t WHERE t.card.account.user.id = :userId")
     Optional<TransactionEntity> findByUserId(Integer id);
 }

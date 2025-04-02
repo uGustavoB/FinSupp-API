@@ -1,9 +1,9 @@
 package com.ugustavob.finsuppapi.entities.transaction;
 
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
+import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,8 +50,8 @@ public class TransactionEntity {
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "account_id", nullable = false)
-    private AccountEntity account;
+    @JoinColumn(name = "card_id", nullable = false)
+    private CardEntity card;
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.SET_NULL)

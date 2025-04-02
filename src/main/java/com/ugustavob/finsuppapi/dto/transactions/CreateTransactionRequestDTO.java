@@ -36,9 +36,9 @@ public record CreateTransactionRequestDTO(
         @Positive(message = "Category Id must be greater than zero")
         @Schema(description = "Category of the transaction", example = "1")
         Integer category,
-        @NotNull(message = "Account Id is required")
-        @Schema(description = "UUID of the account", example = "2")
-        Integer accountId,
+        @NotNull(message = "Card Id is required")
+        @Schema(description = "Id of the card", example = "2")
+        Integer cardId,
         @Schema(description = "Id of the recipient account", example = "2")
         Integer recipientAccountId
 ) {

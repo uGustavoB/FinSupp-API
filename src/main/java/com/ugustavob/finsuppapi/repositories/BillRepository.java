@@ -17,13 +17,13 @@ import java.util.UUID;
 public interface BillRepository extends JpaRepository<BillEntity, Integer>, JpaSpecificationExecutor<BillEntity> {
     Optional<BillEntity> findById(Integer id);
 
-    @Query("SELECT b FROM BillEntity b WHERE b.account.user.id = :userId")
+    @Query("SELECT b FROM BillEntity b WHERE b.card.account.user.id = :userId")
     Page<BillEntity> findAllByUserId(@Param("userId") UUID userId, Pageable pageable);
 
-    @Query("SELECT b FROM BillEntity b WHERE b.account.user.id = :userId")
+    @Query("SELECT b FROM BillEntity b WHERE b.card.account.user.id = :userId")
     Optional<BillEntity> findByUserId(@Param("userId") UUID userId);
 
-    @Query("SELECT b FROM BillEntity b WHERE b.account = :account AND b.startDate = :startDate AND b.endDate = " +
+    @Query("SELECT b FROM BillEntity b WHERE b.card.account = :account AND b.startDate = :startDate AND b.endDate = " +
             ":endDate")
     BillEntity findByAccountAndDateRange(@Param("account") AccountEntity account,
                                                            @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);

@@ -25,7 +25,7 @@ public class CreateTransactionUseCase {
                 transactionEntityFinder);
 
         TransactionType type = createTransactionRequestDTO.type();
-        Double accountBalance = transactionEntityFinder.getAccount().getBalance();
+        Double accountBalance = transactionEntityFinder.getCard().getAccount().getBalance();
         Double transactionAmount = createTransactionRequestDTO.amount();
 
         if (type == TransactionType.TRANSFER && accountBalance.compareTo(transactionAmount) < 0) {

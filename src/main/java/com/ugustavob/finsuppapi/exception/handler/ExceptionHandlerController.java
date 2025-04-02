@@ -111,6 +111,13 @@ public class ExceptionHandlerController {
                 HttpStatus.CONFLICT);
     }
 
+//  Card Exceptions
+    @ExceptionHandler(CardNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCardNotFoundException(CardNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException e) {
         return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),

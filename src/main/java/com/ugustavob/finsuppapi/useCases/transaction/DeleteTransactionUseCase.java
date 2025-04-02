@@ -23,7 +23,8 @@ public class DeleteTransactionUseCase {
         transactionRepository.delete(transaction);
 
         TransactionEntityFinder transactionEntityFinder =
-                transactionService.getAndValidateTransactionEntities(transaction.getAccount(), transaction.getRecipientAccount());
+                transactionService.getAndValidateTransactionEntities(transaction.getCard(),
+        transaction.getRecipientAccount());
 
         transactionEntityFinder = transactionService.revertAccountBalance(transaction, transactionEntityFinder);
 

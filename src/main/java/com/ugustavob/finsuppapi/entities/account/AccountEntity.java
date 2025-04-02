@@ -20,8 +20,12 @@ public class AccountEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String description;
+
     private double balance;
+
+    @Column(nullable = false)
     private String bank;
 
     @Enumerated(EnumType.STRING)

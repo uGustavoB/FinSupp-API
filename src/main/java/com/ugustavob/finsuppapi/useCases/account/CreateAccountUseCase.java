@@ -33,10 +33,8 @@ public class CreateAccountUseCase {
             }
             newAccount.setAccountType(createAccountRequestDTO.accountType());
 
-            if (newAccount.getAccountType() == AccountType.CREDIT) {
-                newAccount.setClosingDay(createAccountRequestDTO.closingDay());
-                newAccount.setPaymentDueDay(createAccountRequestDTO.paymentDueDay());
-            }
+            newAccount.setClosingDay(createAccountRequestDTO.closingDay());
+            newAccount.setPaymentDueDay(createAccountRequestDTO.paymentDueDay());
             return accountRepository.save(newAccount);
         }
 
