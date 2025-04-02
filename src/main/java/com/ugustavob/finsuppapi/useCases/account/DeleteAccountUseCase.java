@@ -13,8 +13,8 @@ import java.util.UUID;
 public class DeleteAccountUseCase {
     private final AccountRepository accountRepository;
 
-    public void execute(UUID uuid) {
-        accountRepository.deleteByIdAndReturnEntity(uuid)
+    public void execute(Integer id) {
+        accountRepository.deleteByIdAndReturnEntity(id)
                         .orElseThrow(AccountNotFoundException::new);
     }
 }

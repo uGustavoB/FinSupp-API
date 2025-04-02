@@ -19,7 +19,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
 
-    public AccountEntity getAccountByIdAndCompareWithUserId(UUID accountId, UUID userId) {
+    public AccountEntity getAccountByIdAndCompareWithUserId(Integer accountId, UUID userId) {
         Optional<UserEntity> userEntity = userRepository.findById(userId);
 
         if (userEntity.isEmpty()) {

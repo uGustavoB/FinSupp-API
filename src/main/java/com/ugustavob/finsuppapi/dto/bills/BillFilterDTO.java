@@ -14,7 +14,7 @@ public class BillFilterDTO {
     private UUID userId;
     private Integer id;
     private BillStatus status;
-    private UUID accountId;
+    private Integer accountId;
     private Integer month;
     private Integer year;
 }

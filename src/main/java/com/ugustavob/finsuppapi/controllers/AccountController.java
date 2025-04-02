@@ -42,7 +42,7 @@ public class AccountController {
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> getAccount(@PathVariable UUID id, HttpServletRequest request) {
+    public ResponseEntity<?> getAccount(@PathVariable Integer id, HttpServletRequest request) {
         var userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
         AccountEntity accountEntity = accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
@@ -97,7 +97,8 @@ public class AccountController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> updateAccount(@PathVariable UUID id, @RequestBody CreateAccountRequestDTO createAccountRequestDTO, HttpServletRequest request) {
+    public ResponseEntity<?> updateAccount(@PathVariable Integer id,
+                                           @RequestBody CreateAccountRequestDTO createAccountRequestDTO, HttpServletRequest request) {
         var userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
         AccountEntity accountEntity = accountService.getAccountByIdAndCompareWithUserId(id, userId);
@@ -113,7 +114,7 @@ public class AccountController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> deleteAccount(@PathVariable UUID id, HttpServletRequest request) {
+    public ResponseEntity<?> deleteAccount(@PathVariable Integer id, HttpServletRequest request) {
         var userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
         accountService.getAccountByIdAndCompareWithUserId(id, userId);

@@ -9,9 +9,6 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDate;
-import java.util.UUID;
-
 @Entity
 @Table(name = "accounts")
 @Getter
@@ -20,8 +17,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AccountEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     private String description;
     private double balance;

@@ -5,13 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Positive;
 import org.springframework.format.annotation.DateTimeFormat;
 
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public record CreateTransactionRequestDTO(
         @NotBlank(message = "Transaction description is required")
@@ -38,10 +36,10 @@ public record CreateTransactionRequestDTO(
         @Positive(message = "Category Id must be greater than zero")
         @Schema(description = "Category of the transaction", example = "1")
         Integer category,
-        @NotNull(message = "Account UUID is required")
-        @Schema(description = "UUID of the account", example = "123e4567-e89b-12d3-a456-426614174000")
-        UUID accountUuid,
-        @Schema(description = "UUID of the recipient account", example = "123e4567-e89b-12d3-a456-426614174000")
-        UUID recipientAccountUuid
+        @NotNull(message = "Account Id is required")
+        @Schema(description = "UUID of the account", example = "2")
+        Integer accountId,
+        @Schema(description = "Id of the recipient account", example = "2")
+        Integer recipientAccountId
 ) {
 }

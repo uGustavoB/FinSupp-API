@@ -9,7 +9,7 @@ public record BillResponseDTO(
         Integer id,
         BillStatus status,
         Double totalAmount,
-        UUID accountId,
+        Integer accountId,
         LocalDate startDate,
         LocalDate endDate,
         LocalDate dueDate

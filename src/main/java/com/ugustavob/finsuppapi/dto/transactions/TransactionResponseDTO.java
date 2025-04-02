@@ -14,7 +14,7 @@ public record TransactionResponseDTO(
         LocalDate transactionDate,
         TransactionType type,
         Integer category,
-        UUID accountUuid,
-        UUID recipientAccountUuid
+        Integer accountUuid,
+        Integer recipientAccountUuid
 ) {
 }

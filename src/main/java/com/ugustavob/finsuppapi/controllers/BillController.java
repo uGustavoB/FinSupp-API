@@ -44,7 +44,7 @@ public class BillController {
     public ResponseEntity<?> searchBills(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) BillStatus status,
-            @RequestParam(required = false) UUID accountId,
+            @RequestParam(required = false) Integer accountId,
             @RequestParam(required = false) Integer month,
             @RequestParam(required = false) Integer year,
             HttpServletRequest request

@@ -4,7 +4,6 @@ import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
-import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
@@ -45,16 +44,16 @@ public class TransactionService {
     }
 
     public TransactionEntityFinder getAndValidateTransactionEntities(CreateTransactionRequestDTO createTransactionRequestDTO) {
-        AccountEntity account = accountRepository.findById(createTransactionRequestDTO.accountUuid())
+        AccountEntity account = accountRepository.findById(createTransactionRequestDTO.accountId())
                 .orElseThrow(AccountNotFoundException::new);
 
         AccountEntity recipientAccount = null;
 
-        if (createTransactionRequestDTO.recipientAccountUuid() != null) {
-            recipientAccount = accountRepository.findById(createTransactionRequestDTO.recipientAccountUuid())
+        if (createTransactionRequestDTO.recipientAccountId() != null) {
+            recipientAccount = accountRepository.findById(createTransactionRequestDTO.recipientAccountId())
                     .orElseThrow(() -> new AccountNotFoundException("Recipient account not found"));
 
-            if (createTransactionRequestDTO.recipientAccountUuid().equals(account.getId())) {
+            if (createTransactionRequestDTO.recipientAccountId().equals(account.getId())) {
                 throw new IllegalArgumentException("You can't transfer to the same account");
             }
         }
