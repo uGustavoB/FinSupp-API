@@ -49,7 +49,7 @@ public class BillController {
             @RequestParam(required = false) Integer year,
             HttpServletRequest request
     ) {
-        var userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
         BillFilterDTO filter = new BillFilterDTO(userId, id, status, accountId, month, year);
 
         List<BillEntity> bills = billService.findAll(filter);

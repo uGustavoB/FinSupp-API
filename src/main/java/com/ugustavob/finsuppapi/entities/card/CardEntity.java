@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.entities.card;
 
+import com.ugustavob.finsuppapi.dto.card.CardResponseDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,4 +36,15 @@ public class CardEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "account_id", nullable = false)
     private AccountEntity account;
+
+    public CardResponseDTO entityToResponseDTO() {
+        return new CardResponseDTO(
+                this.getId(),
+                this.getDescription(),
+                this.getLastNumbers(),
+                this.getLimit(),
+                this.getType(),
+                this.getAccount().getId()
+        );
+    }
 }

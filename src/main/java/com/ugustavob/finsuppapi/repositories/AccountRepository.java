@@ -15,6 +15,8 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Integer>
     Optional<AccountEntity> findByDescription(@NotBlank(message = "Account description is required") String description);
     List<AccountEntity> findAllByUserId(UUID userId);
 
+    boolean existsByUserId(UUID userId);
+
     default Optional<AccountEntity> deleteByIdAndReturnEntity(Integer id) {
         Optional<AccountEntity> account = findById(id);
 

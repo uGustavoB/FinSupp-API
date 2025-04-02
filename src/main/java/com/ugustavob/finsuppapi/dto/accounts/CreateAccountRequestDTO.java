@@ -9,7 +9,7 @@ public record CreateAccountRequestDTO(
         @Schema(description = "Description of the account", example = "My credit account")
         String description,
         @NotBlank(message = "Account type is required")
-        @Schema(description = "Type of the account", example = "CREDIT")
+        @Schema(description = "Type of the account", example = "CHECKING")
         AccountType accountType,
         @NotBlank(message = "Bank is required")
         @Schema(description = "Bank of the account", example = "Banco do Brasil")

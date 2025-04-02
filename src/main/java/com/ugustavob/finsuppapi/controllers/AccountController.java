@@ -43,7 +43,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> getAccount(@PathVariable Integer id, HttpServletRequest request) {
-        var userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
         AccountEntity accountEntity = accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
@@ -99,7 +99,7 @@ public class AccountController {
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> updateAccount(@PathVariable Integer id,
                                            @RequestBody CreateAccountRequestDTO createAccountRequestDTO, HttpServletRequest request) {
-        var userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
         AccountEntity accountEntity = accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
@@ -115,7 +115,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> deleteAccount(@PathVariable Integer id, HttpServletRequest request) {
-        var userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
         accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
