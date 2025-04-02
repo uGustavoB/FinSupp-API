@@ -16,6 +16,7 @@ import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
+import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,7 +67,7 @@ public class TransactionService {
 
     public TransactionEntity getTransactionEntity(CreateTransactionRequestDTO createTransactionRequestDTO, TransactionEntityFinder transactionEntityFinder) {
         TransactionEntity newTransaction = new TransactionEntity();
-        newTransaction.setDescription(createTransactionRequestDTO.description());
+        newTransaction.setDescription(StringFormatUtil.toTitleCase(createTransactionRequestDTO.description()));
         newTransaction.setAmount(createTransactionRequestDTO.amount());
         newTransaction.setTransactionDate(createTransactionRequestDTO.transactionDate());
         newTransaction.setTransactionType(createTransactionRequestDTO.type());

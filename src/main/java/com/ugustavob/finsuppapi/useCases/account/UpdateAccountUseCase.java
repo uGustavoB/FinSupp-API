@@ -6,6 +6,7 @@ import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.exception.AccountAlreadyExistsException;
 import com.ugustavob.finsuppapi.exception.AccountNotFoundException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
+import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +30,8 @@ public class UpdateAccountUseCase {
             }
         }
 
-        account.setDescription(createAccountRequestDTO.description());
-        account.setBank(createAccountRequestDTO.bank());
+        account.setDescription(StringFormatUtil.toTitleCase(createAccountRequestDTO.description()));
+        account.setBank(StringFormatUtil.toTitleCase(createAccountRequestDTO.bank()));
         account.setAccountType(createAccountRequestDTO.accountType());
 
         if (createAccountRequestDTO.balance() != null) {

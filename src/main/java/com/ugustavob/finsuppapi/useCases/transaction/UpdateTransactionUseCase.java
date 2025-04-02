@@ -8,6 +8,7 @@ import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
 import com.ugustavob.finsuppapi.services.BillService;
 import com.ugustavob.finsuppapi.services.TransactionService;
+import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class UpdateTransactionUseCase {
         transactionEntityFinder = transactionService.revertAccountBalance(transaction, transactionEntityFinder);
         billService.revertTransactionBills(transaction);
 
-        transaction.setDescription(createTransactionRequestDTO.description());
+        transaction.setDescription(StringFormatUtil.toTitleCase(createTransactionRequestDTO.description()));
         transaction.setAmount(createTransactionRequestDTO.amount());
         transaction.setTransactionType(createTransactionRequestDTO.type());
         transaction.setTransactionDate(createTransactionRequestDTO.transactionDate());

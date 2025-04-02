@@ -6,6 +6,7 @@ import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.AccountAlreadyExistsException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
+import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,8 @@ public class CreateAccountUseCase {
 
         if (account.isEmpty()) {
             AccountEntity newAccount = new AccountEntity();
-            newAccount.setDescription(createAccountRequestDTO.description());
-            newAccount.setBank(createAccountRequestDTO.bank());
+            newAccount.setDescription(StringFormatUtil.toTitleCase(createAccountRequestDTO.description()));
+            newAccount.setBank(StringFormatUtil.toTitleCase(createAccountRequestDTO.bank()));
             newAccount.setUser(userEntity);
             if (createAccountRequestDTO.balance() != null) {
                 newAccount.setBalance(createAccountRequestDTO.balance());

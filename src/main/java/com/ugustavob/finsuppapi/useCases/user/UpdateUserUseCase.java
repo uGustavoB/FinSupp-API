@@ -3,6 +3,7 @@ package com.ugustavob.finsuppapi.useCases.user;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.UserNotFoundException;
 import com.ugustavob.finsuppapi.repositories.UserRepository;
+import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class UpdateUserUseCase {
                 throw new RuntimeException("Email already exists");
             }
 
-            userEntity.setName(user.getName());
+            userEntity.setName(StringFormatUtil.toTitleCase(user.getName()));
             userEntity.setEmail(user.getEmail());
             userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
 

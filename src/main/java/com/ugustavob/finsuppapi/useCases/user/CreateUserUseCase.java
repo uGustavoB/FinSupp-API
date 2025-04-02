@@ -4,6 +4,7 @@ import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.UserAlreadyExistsException;
 import com.ugustavob.finsuppapi.repositories.UserRepository;
+import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,7 +25,7 @@ public class CreateUserUseCase {
 
         if (user.isEmpty()) {
             UserEntity newUser = new UserEntity();
-            newUser.setName(registerRequest.name());
+            newUser.setName(StringFormatUtil.toTitleCase(registerRequest.name()));
             newUser.setEmail(registerRequest.email());
             newUser.setPassword(passwordEncoder.encode(registerRequest.password()));
 

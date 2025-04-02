@@ -89,6 +89,10 @@ public class BillService {
 
                 BillEntity bill = findOrCreateBill(account, installmentDate);
 
+                if (bill.getStatus() != BillStatus.OPEN) {
+                    throw new IllegalStateException("Bill is not open");
+                }
+
                 BillItemEntity billItem = new BillItemEntity();
                 billItem.setBill(bill);
                 billItem.setTransaction(transaction);
@@ -107,8 +111,15 @@ public class BillService {
     public void revertTransactionBills(TransactionEntity transaction) {
         List<BillItemEntity> bills = billItemRepository.findByTransaction(transaction);
 
+        if (bills.isEmpty()) {
+            return;
+        }
+
         for (BillItemEntity billItem : new ArrayList<>(bills)) {
             BillEntity bill = billItem.getBill();
+            if (bill.getStatus() != BillStatus.OPEN) {
+                throw new IllegalStateException("Bill is not open");
+            }
 
             billItemRepository.delete(billItem);
 

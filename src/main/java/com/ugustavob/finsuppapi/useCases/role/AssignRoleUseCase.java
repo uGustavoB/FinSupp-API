@@ -5,6 +5,7 @@ import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.UserAlreadyHasRoleException;
 import com.ugustavob.finsuppapi.repositories.UserRepository;
 import com.ugustavob.finsuppapi.useCases.user.GetUserUseCase;
+import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class AssignRoleUseCase {
         if (user.getRole().contains("ROLE_" + assignRoleRequestDTO.role().toUpperCase())) {
             throw new UserAlreadyHasRoleException("User already has role: " + assignRoleRequestDTO.role());
         }
-        user.getRole().add("ROLE_" + assignRoleRequestDTO.role().toUpperCase());
+        user.getRole().add(StringFormatUtil.formatRole(assignRoleRequestDTO.role()));
 
         return userRepository.save(user);
     }

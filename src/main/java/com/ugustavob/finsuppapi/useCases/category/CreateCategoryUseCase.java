@@ -4,6 +4,7 @@ import com.ugustavob.finsuppapi.dto.categories.CreateCategoryRequestDTO;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.exception.CategoryDescriptionAlreadyExistsException;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
+import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class CreateCategoryUseCase {
 
         if (category.isEmpty()) {
             CategoryEntity newCategory = new CategoryEntity();
-            newCategory.setDescription(createCategoryRequestDTO.description());
+            newCategory.setDescription(StringFormatUtil.toTitleCase(createCategoryRequestDTO.description()));
 
             return categoryRepository.save(newCategory);
         }
