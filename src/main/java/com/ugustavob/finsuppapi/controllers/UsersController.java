@@ -109,9 +109,9 @@ public class UsersController {
     })
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<SuccessResponseDTO<GetUserResponseDTO>> getUser(HttpServletRequest request) {
-        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        UserEntity user = getUserUseCase.execute(id);
+        UserEntity user = getUserUseCase.execute(userId);
 
         return ResponseEntity.ok(
                 new SuccessResponseDTO<>(
@@ -338,11 +338,11 @@ public class UsersController {
             RegisterRequestDTO registerRequestDTO,
             HttpServletRequest request
     ) {
-        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
         UserEntity user = updateUserUseCase.execute(
                 new UserEntity(
-                        id,
+                        userId,
                         registerRequestDTO.name(),
                         registerRequestDTO.email(),
                         registerRequestDTO.password(),
@@ -444,9 +444,9 @@ public class UsersController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Transactional
     public ResponseEntity<SuccessResponseDTO<?>> deleteUser(HttpServletRequest request, @PathVariable UUID uuid) {
-        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        if (id.toString().equals(uuid.toString())) {
+        if (userId.toString().equals(uuid.toString())) {
             throw new SelfDelectionException();
         }
 

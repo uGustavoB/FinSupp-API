@@ -38,6 +38,8 @@ public class CardController {
 
         CardEntity card = cardService.getCardById(id, userId);
 
+        System.out.println(card.entityToResponseDTO());
+
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Card retrieved successfully",
                 card.entityToResponseDTO()

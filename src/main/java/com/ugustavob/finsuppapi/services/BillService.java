@@ -3,18 +3,16 @@ package com.ugustavob.finsuppapi.services;
 import com.ugustavob.finsuppapi.dto.bills.BillFilterDTO;
 import com.ugustavob.finsuppapi.dto.bills.BillItemResponseDTO;
 import com.ugustavob.finsuppapi.dto.bills.BillResponseDTO;
-import com.ugustavob.finsuppapi.dto.bills.BillPayRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
-import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
 import com.ugustavob.finsuppapi.entities.bill.BillItemEntity;
+import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.card.CardType;
-import com.ugustavob.finsuppapi.specifications.BillSpecification;
-import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.repositories.BillItemRepository;
 import com.ugustavob.finsuppapi.repositories.BillRepository;
+import com.ugustavob.finsuppapi.specifications.BillSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +23,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,6 @@ public class BillService {
     private final BillItemRepository billItemRepository;
 
     public BillResponseDTO entityToResponseDto(BillEntity bill) {
-        System.out.println("Chegou aqui");
         return new BillResponseDTO(
                 bill.getId(),
                 bill.getStatus(),
@@ -80,7 +80,7 @@ public class BillService {
 
     @Transactional
     public void addTransactionToBill(TransactionEntity transaction) {
-        if (transaction.isAddToBill() && transaction.getCard().getType() == CardType.CREDIT) {
+        if (transaction.getCard().getType() == CardType.CREDIT) {
             AccountEntity account = transaction.getCard().getAccount();
             LocalDate dueDate = transaction.getTransactionDate();
 
@@ -120,9 +120,6 @@ public class BillService {
 
         for (BillItemEntity billItem : new ArrayList<>(bills)) {
             BillEntity bill = billItem.getBill();
-            if (bill.getStatus() != BillStatus.OPEN) {
-                throw new IllegalStateException("Bill is not open");
-            }
 
             billItemRepository.delete(billItem);
 
@@ -131,6 +128,12 @@ public class BillService {
             if (bill.getTotalAmount() == 0) {
                 billRepository.delete(bill);
             } else {
+                if (bill.getDueDate().isBefore(LocalDate.now())) {
+                    bill.setStatus(BillStatus.OVERDUE);
+                } else {
+                    bill.setStatus(BillStatus.OPEN);
+                }
+
                 billRepository.save(bill);
             }
         }
@@ -153,6 +156,21 @@ public class BillService {
         return bill;
     }
 
+    @Transactional
+    public void revertPayment(BillEntity bill) {
+        if (bill.getStatus() != BillStatus.PAID) {
+            throw new IllegalStateException("Bill is not paid");
+        }
+
+        if (bill.getDueDate().isBefore(LocalDate.now())) {
+            bill.setStatus(BillStatus.OVERDUE);
+        } else {
+            bill.setStatus(BillStatus.OPEN);
+        }
+
+        billRepository.save(bill);
+    }
+
     public List<BillEntity> findAll(BillFilterDTO filter) {
         Specification<BillEntity> specification = BillSpecification.filter(filter);
         return billRepository.findAll(specification);
@@ -162,5 +180,9 @@ public class BillService {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
         Page<BillItemEntity> billItems = billItemRepository.findByBillId(bill.getId(), pageable);
         return billItems.map(this::billItemEntityToResponseDto);
+    }
+
+    public Optional<BillEntity> findByMonthAndYearAndUser(int month, int year, UUID userId) {
+        return billRepository.findByStartDateMonthAndStartDateYearAndUserId(month, year, userId);
     }
 }

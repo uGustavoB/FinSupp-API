@@ -4,6 +4,7 @@ import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
+import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.TransactionService;
 import com.ugustavob.finsuppapi.useCases.transaction.CreateTransactionUseCase;
@@ -43,9 +44,13 @@ public class TransactionController {
             @RequestParam(defaultValue = "10", required = false) int size,
             HttpServletRequest request
     ) {
-        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        Page<TransactionResponseDTO> transactions = transactionService.getAllTransactionsFromUser(id, page, size);
+        Page<TransactionResponseDTO> transactions = transactionService.getAllTransactionsFromUser(userId, page, size);
+
+        if (transactions.getTotalElements() > 0) {
+            throw new TransactionNotFoundException("No transactions found");
+        }
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Transactions retrieved",
@@ -114,9 +119,9 @@ public class TransactionController {
     @SecurityRequirement(name = "bearer")
     @Transactional
     public ResponseEntity<?> deleteTransaction(@PathVariable int id, HttpServletRequest request) {
-        baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        deleteTransactionUseCase.execute(id);
+        deleteTransactionUseCase.execute(id, userId);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Transaction deleted"

@@ -25,9 +25,6 @@ public record CreateTransactionRequestDTO(
         @NotNull(message = "Transaction type is required. Allowed values: WITHDRAW, DEPOSIT, TRANSFER")
         @Schema(description = "Type of the transaction", example = "WITHDRAW", allowableValues = {"WITHDRAW", "DEPOSIT", "TRANSFER"})
         TransactionType type,
-        @NotNull(message = "Add to bill is required")
-        @Schema(description = "Add to bill", example = "false")
-        Boolean addToBill,
         @Nullable()
         @Positive(message = "Installments must be greater than zero")
         @Schema(description = "Number of installments", example = "1", defaultValue = "1")

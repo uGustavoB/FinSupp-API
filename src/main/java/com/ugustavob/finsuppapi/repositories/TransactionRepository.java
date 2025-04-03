@@ -24,6 +24,12 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
         return Optional.empty();
     }
 
+    @Query("SELECT COUNT(b) > 0 FROM BillEntity b " +
+            "JOIN BillItemEntity bi ON bi.bill.id = b.id " +
+            "WHERE bi.transaction.id = :transactionId " +
+            "AND b.status IN ('PAID', 'CLOSED', 'CANCELED')")
+    boolean existsBillWithTransactionId(@Param("transactionId") Integer transactionId);
+
     @Query("SELECT t FROM TransactionEntity t WHERE t.card.account.user.id = :userId")
     Page<TransactionEntity> findByUserId(@Param("userId") UUID userId, Pageable pageable);
 

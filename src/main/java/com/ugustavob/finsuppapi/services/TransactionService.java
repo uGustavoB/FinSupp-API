@@ -87,9 +87,8 @@ public class TransactionService {
         newTransaction.setCategory(transactionEntityFinder.getCategory());
         newTransaction.setCard(transactionEntityFinder.getCard());
         newTransaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
-        newTransaction.setAddToBill(createTransactionRequestDTO.addToBill());
 
-        if (createTransactionRequestDTO.addToBill() && createTransactionRequestDTO.installments() != null) {
+        if (createTransactionRequestDTO.installments() != null) {
             newTransaction.setInstallments(createTransactionRequestDTO.installments());
         }
 
@@ -109,7 +108,6 @@ public class TransactionService {
                 transaction.getDescription(),
                 transaction.getAmount(),
                 transaction.getInstallments(),
-                transaction.isAddToBill(),
                 transaction.getTransactionDate(),
                 transaction.getTransactionType(),
                 transaction.getCategory().getId(),
@@ -183,11 +181,10 @@ public class TransactionService {
                         "Card not found"));
 
         TransactionEntity transaction = new TransactionEntity();
-        transaction.setDescription("Bill payment");
+        transaction.setDescription("Payment of the bill: " + bill.getStartDate().getMonthValue() + "/" + bill.getStartDate().getYear());
         transaction.setAmount(bill.getTotalAmount());
         transaction.setTransactionType(TransactionType.WITHDRAW);
         transaction.setCard(card);
-        transaction.setAddToBill(false);
         transaction.setTransactionDate(LocalDate.now());
         transaction.setCategory(category);
         transaction.setRecipientAccount(null);

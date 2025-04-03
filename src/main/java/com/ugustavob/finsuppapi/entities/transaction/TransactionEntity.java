@@ -32,9 +32,6 @@ public class TransactionEntity {
     @Column(nullable = false)
     private double amount;
 
-    @Column(nullable = false)
-    private boolean addToBill = false;
-
     private int installments;
 
     @Column(name = "transaction_date", nullable = false)

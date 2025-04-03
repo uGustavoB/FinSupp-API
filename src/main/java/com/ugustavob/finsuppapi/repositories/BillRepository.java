@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public interface BillRepository extends JpaRepository<BillEntity, Integer>, JpaSpecificationExecutor<BillEntity> {
     Optional<BillEntity> findById(Integer id);
@@ -21,12 +22,12 @@ public interface BillRepository extends JpaRepository<BillEntity, Integer>, JpaS
     Page<BillEntity> findAllByUserId(@Param("userId") UUID userId, Pageable pageable);
 
     @Query("SELECT b FROM BillEntity b WHERE b.card.account.user.id = :userId")
-    Optional<BillEntity> findByUserId(@Param("userId") UUID userId);
+    Optional<BillEntity> findAllByUserId(@Param("userId") UUID userId);
 
     @Query("SELECT b FROM BillEntity b WHERE b.card.account = :account AND b.startDate = :startDate AND b.endDate = " +
             ":endDate")
     BillEntity findByAccountAndDateRange(@Param("account") AccountEntity account,
-                                                           @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+                                         @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     @Query("SELECT b FROM BillEntity b WHERE b.status = :status AND b.endDate <= :today")
     Page<BillEntity> findBillsToClose(
@@ -50,4 +51,23 @@ public interface BillRepository extends JpaRepository<BillEntity, Integer>, JpaS
 
         return Optional.empty();
     }
+
+    default Stream<BillEntity> findBillByMonthAndYear(int month, int year, UUID userId) {
+        return findAllByUserId(userId).stream()
+                .filter(bill -> isBillFromMonthAndYear(bill, month, year));
+    }
+
+    private boolean isBillFromMonthAndYear(BillEntity bill, int month, int year) {
+        return (bill.getStartDate().getMonthValue() == month && bill.getStartDate().getYear() == year);
+    }
+
+    @Query("SELECT b FROM BillEntity b " +
+            "WHERE MONTH(b.startDate) = :month " +
+            "AND YEAR(b.startDate) = :year " +
+            "AND b.card.account.user.id = :userId")
+    Optional<BillEntity> findByStartDateMonthAndStartDateYearAndUserId(
+            @Param("month") int month,
+            @Param("year") int year,
+            @Param("userId") UUID userId);
+
 }

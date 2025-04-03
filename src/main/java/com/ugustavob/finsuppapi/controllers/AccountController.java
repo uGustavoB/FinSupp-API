@@ -56,13 +56,13 @@ public class AccountController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> getAccounts(HttpServletRequest request) {
-        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        userService.validateUserByIdAndReturn(id);
+        userService.validateUserByIdAndReturn(userId);
 
         ArrayList<AccountResponseDTO> accounts = new ArrayList<>();
 
-        accountRepository.findAllByUserId(id).forEach(accountEntity -> accounts.add(
+        accountRepository.findAllByUserId(userId).forEach(accountEntity -> accounts.add(
                 accountService.entityToResponseDto(accountEntity)
         ));
 
@@ -76,9 +76,9 @@ public class AccountController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> createAccount(@RequestBody CreateAccountRequestDTO createAccountRequestDTO, HttpServletRequest request) {
-        var id = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        UserEntity userEntity = userService.validateUserByIdAndReturn(id);
+        UserEntity userEntity = userService.validateUserByIdAndReturn(userId);
 
         AccountEntity accountEntity = createAccountUseCase.execute(createAccountRequestDTO, userEntity);
 

@@ -34,9 +34,8 @@ public class UpdateTransactionUseCase {
         transaction.setCategory(transactionEntityFinder.getCategory());
         transaction.setCard(transactionEntityFinder.getCard());
         transaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
-        transaction.setAddToBill(createTransactionRequestDTO.addToBill());
 
-        if (createTransactionRequestDTO.addToBill() && createTransactionRequestDTO.installments() != null) {
+        if (createTransactionRequestDTO.installments() != null) {
             transaction.setInstallments(createTransactionRequestDTO.installments());
         } else {
             transaction.setInstallments(0);
