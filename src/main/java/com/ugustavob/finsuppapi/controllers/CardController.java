@@ -60,7 +60,7 @@ public class CardController {
         ));
     }
 
-    @PostMapping("/create")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> createCard(@Valid @RequestBody CreateCardRequestDTO createCardRequestDTO,

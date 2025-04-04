@@ -3,7 +3,7 @@
 ## 🚀 Começando
 
 ### Pré-requisitos
-- Java 17+
+- Java 23
 - Maven
 - Docker
 

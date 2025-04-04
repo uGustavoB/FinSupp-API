@@ -50,11 +50,12 @@ public class BillService {
     public BillItemResponseDTO billItemEntityToResponseDto(BillItemEntity billItem) {
         return new BillItemResponseDTO(
                 billItem.getId(),
-                billItem.getTransaction().getDescription(),
+                billItem.getTransaction() != null ? billItem.getTransaction().getDescription() : billItem.getSubscription().getDescription(),
                 billItem.getAmount(),
                 billItem.getInstallmentNumber(),
                 billItem.getBill().getId(),
-                billItem.getTransaction().getId()
+                billItem.getTransaction() != null ? billItem.getTransaction().getId() : null,
+                billItem.getSubscription() != null ? billItem.getSubscription().getId() : null
         );
     }
 

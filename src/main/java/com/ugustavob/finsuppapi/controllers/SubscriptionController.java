@@ -62,7 +62,7 @@ public class SubscriptionController {
         ));
     }
 
-    @PostMapping("/create")
+    @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> createSubscription(@Valid @RequestBody CreateSubscriptionRequestDTO createSubscriptionRequestDTO,

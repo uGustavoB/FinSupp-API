@@ -6,6 +6,7 @@ public record BillItemResponseDTO(
     double amount,
     Integer installmentNumber,
     Integer billId,
-    Integer transactionId
+    Integer transactionId,
+    Integer subscriptionId
 ) {
 }
