@@ -17,7 +17,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class CardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Changed from int to Integer
+    private Integer id;
 
     @Column(nullable = false)
     private String description;
@@ -25,10 +25,10 @@ public class CardEntity {
     @Column(nullable = false, length = 4)
     private String lastNumbers;
 
-    @Column(name = "card_limit") // Renamed to avoid SQL keyword conflict
+    @Column(name = "card_limit")
     private Integer limit;
 
-    @Enumerated(EnumType.STRING) // Explicit enum mapping
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CardType type;
 

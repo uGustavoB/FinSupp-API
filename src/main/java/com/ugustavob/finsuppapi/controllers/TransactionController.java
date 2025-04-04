@@ -77,9 +77,9 @@ public class TransactionController {
     @SecurityRequirement(name = "bearer")
     @Transactional
     public ResponseEntity<?> createTransaction(@Valid @RequestBody CreateTransactionRequestDTO createTransactionRequestDTO, HttpServletRequest request) {
-        baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        TransactionEntity transaction = createTransactionUseCase.execute(createTransactionRequestDTO);
+        TransactionEntity transaction = createTransactionUseCase.execute(createTransactionRequestDTO, userId);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

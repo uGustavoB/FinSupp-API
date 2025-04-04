@@ -4,12 +4,15 @@ import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
+import com.ugustavob.finsuppapi.exception.CardNotFoundException;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
 import com.ugustavob.finsuppapi.services.BillService;
 import com.ugustavob.finsuppapi.services.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +21,15 @@ public class CreateTransactionUseCase {
     private final TransactionService transactionService;
     private final BillService billService;
 
-    public TransactionEntity execute(@Valid CreateTransactionRequestDTO createTransactionRequestDTO) {
+    public TransactionEntity execute(@Valid CreateTransactionRequestDTO createTransactionRequestDTO, UUID userId) {
         TransactionEntityFinder transactionEntityFinder = transactionService.getAndValidateTransactionEntities(createTransactionRequestDTO);
 
         TransactionEntity newTransaction = transactionService.getTransactionEntity(createTransactionRequestDTO,
                 transactionEntityFinder);
+
+        if (!newTransaction.getCard().getAccount().getUser().getId().equals(userId)) {
+            throw new CardNotFoundException();
+        };
 
         TransactionType type = createTransactionRequestDTO.type();
         Double accountBalance = transactionEntityFinder.getCard().getAccount().getBalance();

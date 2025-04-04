@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.entities.bill;
 
+import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,8 +28,13 @@ public class BillItemEntity {
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "transaction_id", nullable = false)
+    @JoinColumn(name = "transaction_id")
     private TransactionEntity transaction;
+
+    @ManyToOne()
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "subscription_id")
+    private SubscriptionEntity subscription;
 
     private double amount;
     private int installmentNumber;

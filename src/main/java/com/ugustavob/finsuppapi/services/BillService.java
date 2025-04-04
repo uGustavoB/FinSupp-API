@@ -9,6 +9,7 @@ import com.ugustavob.finsuppapi.entities.bill.BillItemEntity;
 import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.card.CardType;
+import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.repositories.BillItemRepository;
 import com.ugustavob.finsuppapi.repositories.BillRepository;
@@ -59,7 +60,7 @@ public class BillService {
         int closingDay = account.getClosingDay();
         LocalDate startDate = transactionDate.withDayOfMonth(closingDay).plusDays(1);
         LocalDate endDate = startDate.plusMonths(1).withDayOfMonth(closingDay);
-        LocalDate dueDate = endDate.withDayOfMonth(10);
+        LocalDate dueDate = endDate.withDayOfMonth(account.getPaymentDueDay());
 
         BillEntity bill = billRepository.findByAccountAndDateRange(account, startDate, endDate);
 
@@ -108,6 +109,69 @@ public class BillService {
                 billRepository.save(bill);
             }
         }
+    }
+
+    @Transactional
+    public void addSubscriptionToBill(SubscriptionEntity subscription) {
+        // Validações
+        if (subscription == null || subscription.getCard() == null || subscription.getCard().getAccount() == null) {
+            throw new IllegalArgumentException("Subscription, card or account cannot be null");
+        }
+
+        CardEntity card = subscription.getCard();
+        AccountEntity account = card.getAccount();
+
+        LocalDate now = LocalDate.now();
+        LocalDate startDate = now.withDayOfMonth(account.getClosingDay()).plusDays(1);
+
+        LocalDate endDate = startDate.plusMonths(1).withDayOfMonth(account.getClosingDay());
+        LocalDate dueDate = endDate.withDayOfMonth(account.getPaymentDueDay());
+
+        int totalInstallments = switch (subscription.getInterval()) {
+            case MONTHLY -> 1;
+            case QUARTERLY -> 3;
+            case SEMI_ANNUAL -> 6;
+            case YEARLY -> 12;
+        };
+
+        addSubscriptionInstallments(subscription, startDate, totalInstallments);
+    }
+
+    private void addSubscriptionInstallments(
+            SubscriptionEntity subscription,
+            LocalDate startDate,
+            int totalInstallments
+    ) {
+        List<BillItemEntity> itemsToSave = new ArrayList<>();
+
+        for (int installmentNumber = 1; installmentNumber <= totalInstallments; installmentNumber++) {
+            BillEntity bill = findOrCreateBill(
+                    subscription.getCard().getAccount(),
+                    subscription.getCard(),
+                    startDate
+            );
+
+            if (bill.getStatus() != BillStatus.OPEN) {
+//                continue no próximo mês
+                startDate = startDate.plusMonths(1);
+                totalInstallments += 1;
+                continue;
+            }
+
+            BillItemEntity billItem = new BillItemEntity();
+            billItem.setBill(bill);
+            billItem.setAmount(subscription.getPrice());
+            billItem.setInstallmentNumber(installmentNumber);
+            billItem.setSubscription(subscription);
+
+            itemsToSave.add(billItem);
+            bill.setTotalAmount(bill.getTotalAmount() + subscription.getPrice());
+            billRepository.save(bill);
+
+            startDate = startDate.plusMonths(1);
+        }
+
+        billItemRepository.saveAll(itemsToSave);
     }
 
     @Transactional

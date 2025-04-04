@@ -23,12 +23,6 @@ public class BillEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-//    @ManyToOne()
-//    @OnDelete(action = OnDeleteAction.CASCADE)
-//    @JoinColumn(name = "account_id", nullable = false)
-//    private AccountEntity account;
-
-//    Many to one card
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "card_id", nullable = false)

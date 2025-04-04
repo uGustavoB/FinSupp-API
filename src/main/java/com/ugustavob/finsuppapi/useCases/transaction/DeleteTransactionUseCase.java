@@ -26,6 +26,13 @@ public class DeleteTransactionUseCase {
     public void execute(Integer id, UUID userId) {
         TransactionEntity transaction = transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
 
+        System.out.println(transaction.getCard().getAccount().getUser().getId());
+        System.out.println(userId);
+
+        if (!transaction.getCard().getAccount().getUser().getId().equals(userId)) {
+            throw new BusinessException("Transaction does not belong to the user");
+        };
+
         if (transactionRepository.existsBillWithTransactionId(transaction.getId())) {
             throw new BusinessException("Transaction cannot be deleted");
         }
