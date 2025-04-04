@@ -124,6 +124,19 @@ public class ExceptionHandlerController {
                 HttpStatus.CONFLICT);
     }
 
+//  Subscription Exceptions
+    @ExceptionHandler(SubscriptionNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleSubscriptionNotFoundException(SubscriptionNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(SubscriptionAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleSubscriptionAlreadyExistsException(SubscriptionAlreadyExistsException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.CONFLICT);
+    }
+
 //  Others Exceptions
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponseDTO> handleBusinessException(BusinessException e) {

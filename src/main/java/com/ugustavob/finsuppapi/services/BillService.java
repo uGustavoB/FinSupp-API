@@ -11,6 +11,7 @@ import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.card.CardType;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
+import com.ugustavob.finsuppapi.exception.BillNotFoundException;
 import com.ugustavob.finsuppapi.repositories.BillItemRepository;
 import com.ugustavob.finsuppapi.repositories.BillRepository;
 import com.ugustavob.finsuppapi.specifications.BillSpecification;
@@ -49,6 +50,7 @@ public class BillService {
     public BillItemResponseDTO billItemEntityToResponseDto(BillItemEntity billItem) {
         return new BillItemResponseDTO(
                 billItem.getId(),
+                billItem.getTransaction().getDescription(),
                 billItem.getAmount(),
                 billItem.getInstallmentNumber(),
                 billItem.getBill().getId(),
@@ -152,7 +154,6 @@ public class BillService {
             );
 
             if (bill.getStatus() != BillStatus.OPEN) {
-//                continue no próximo mês
                 startDate = startDate.plusMonths(1);
                 totalInstallments += 1;
                 continue;
@@ -175,9 +176,25 @@ public class BillService {
     }
 
     @Transactional
+    public void removeSubscriptionFromBill(SubscriptionEntity subscription) {
+        List<BillItemEntity> bills = billItemRepository.findBySubscription(subscription);
+
+        bills.forEach(bill -> {
+            System.out.println("Bill ID: " + bill.getBill().getId());
+            System.out.println("Bill Item ID: " + bill.getId());
+        });
+
+        removeEntityFromBill(bills);
+    }
+
+    @Transactional
     public void revertTransactionBills(TransactionEntity transaction) {
         List<BillItemEntity> bills = billItemRepository.findByTransaction(transaction);
 
+        removeEntityFromBill(bills);
+    }
+
+    private void removeEntityFromBill(List<BillItemEntity> bills) {
         if (bills.isEmpty()) {
             return;
         }
@@ -240,8 +257,13 @@ public class BillService {
         return billRepository.findAll(specification);
     }
 
-    public Page<BillItemResponseDTO> findBillItemsByBill(BillEntity bill, int page, int size) {
+    public Page<BillItemResponseDTO> findBillItemsByBill(BillEntity bill, UUID userId, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
+
+        if (!bill.getCard().getAccount().getUser().getId().equals(userId)) {
+            throw new BillNotFoundException("Bill not found.");
+        }
+
         Page<BillItemEntity> billItems = billItemRepository.findByBillId(bill.getId(), pageable);
         return billItems.map(this::billItemEntityToResponseDto);
     }

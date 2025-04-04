@@ -77,11 +77,11 @@ public class BillController {
             @RequestParam(defaultValue = "10") Integer size,
             HttpServletRequest request
     ) {
-        baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
         BillEntity bill = billRepository.findById(id).orElseThrow(BillNotFoundException::new);
 
-        Page<BillItemResponseDTO> billItems = billService.findBillItemsByBill(bill, page, size);
+        Page<BillItemResponseDTO> billItems = billService.findBillItemsByBill(bill, userId, page, size);
 
         if (billItems.isEmpty()) {
             throw new BillNotFoundException("No items found for this bill");

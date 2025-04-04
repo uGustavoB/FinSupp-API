@@ -16,5 +16,6 @@ public interface CardRepository extends JpaRepository<CardEntity, Integer> {
 
     List<CardEntity> findAllByAccountId(Integer id);
 
+    @Query("SELECT c FROM CardEntity c JOIN AccountEntity a ON c.account.id = a.id WHERE c.type = 'DEBIT' AND c.description = ?1")
     Optional<CardEntity> findByDescription(String description);
 }

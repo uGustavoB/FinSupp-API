@@ -1,6 +1,7 @@
 package com.ugustavob.finsuppapi.repositories;
 
 import com.ugustavob.finsuppapi.entities.bill.BillItemEntity;
+import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,4 +33,7 @@ public interface BillItemRepository extends JpaRepository<BillItemEntity, Intege
 
         return Optional.empty();
     }
+
+    @Query("SELECT bi FROM BillItemEntity bi WHERE bi.subscription = :subscription AND bi.bill.status = 'OPEN'")
+    List<BillItemEntity> findBySubscription(SubscriptionEntity subscription);
 }
