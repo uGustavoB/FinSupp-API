@@ -9,9 +9,6 @@ import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.services.AccountService;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.UserService;
-import com.ugustavob.finsuppapi.useCases.account.CreateAccountUseCase;
-import com.ugustavob.finsuppapi.useCases.account.DeleteAccountUseCase;
-import com.ugustavob.finsuppapi.useCases.account.UpdateAccountUseCase;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,13 +27,10 @@ import java.util.UUID;
 @Tag(name = "Accounts", description = "Endpoints for bank account management")
 @RequiredArgsConstructor
 public class AccountController {
-    private final CreateAccountUseCase createAccountUseCase;
     private final AccountRepository accountRepository;
-    private final UpdateAccountUseCase updateAccountUseCase;
-    private final DeleteAccountUseCase deleteAccountUseCase;
     private final AccountService accountService;
-    private final BaseService baseService;
     private final UserService userService;
+    private final BaseService baseService;
 
 
     @GetMapping("/{id}")
@@ -80,7 +74,7 @@ public class AccountController {
 
         UserEntity userEntity = userService.validateUserByIdAndReturn(userId);
 
-        AccountEntity accountEntity = createAccountUseCase.execute(createAccountRequestDTO, userEntity);
+        AccountEntity accountEntity = accountService.createAccount(createAccountRequestDTO, userEntity);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -103,7 +97,7 @@ public class AccountController {
 
         AccountEntity accountEntity = accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
-        AccountEntity newAccountEntity = updateAccountUseCase.execute(createAccountRequestDTO, accountEntity);
+        AccountEntity newAccountEntity = accountService.updateAccount(createAccountRequestDTO, accountEntity);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Account updated",
@@ -119,7 +113,7 @@ public class AccountController {
 
         accountService.getAccountByIdAndCompareWithUserId(id, userId);
 
-        deleteAccountUseCase.execute(id);
+        accountService.deleteAccount(id);
         return ResponseEntity.ok().body(new SuccessResponseDTO<>("Account deleted"));
     }
 }
