@@ -11,10 +11,6 @@ import com.ugustavob.finsuppapi.exception.SelfDelectionException;
 import com.ugustavob.finsuppapi.exception.UserNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.UserService;
-import com.ugustavob.finsuppapi.useCases.role.AssignRoleUseCase;
-import com.ugustavob.finsuppapi.useCases.user.DeleteUserUseCase;
-import com.ugustavob.finsuppapi.useCases.user.GetUserUseCase;
-import com.ugustavob.finsuppapi.useCases.user.UpdateUserUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -39,10 +35,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Tag(name = "Users", description = "Endpoints for users")
 public class UsersController {
-    private final GetUserUseCase getUserUseCase;
-    private final AssignRoleUseCase assignRoleUseCase;
-    private final DeleteUserUseCase deleteUserUseCase;
-    private final UpdateUserUseCase updateUserUseCase;
     private final BaseService baseService;
     private final UserService userService;
 
@@ -111,7 +103,7 @@ public class UsersController {
     public ResponseEntity<SuccessResponseDTO<GetUserResponseDTO>> getUser(HttpServletRequest request) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        UserEntity user = getUserUseCase.execute(userId);
+        UserEntity user = userService.getUserById(userId);
 
         return ResponseEntity.ok(
                 new SuccessResponseDTO<>(
@@ -340,7 +332,7 @@ public class UsersController {
     ) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        UserEntity user = updateUserUseCase.execute(
+        UserEntity user = userService.updateUser(
                 new UserEntity(
                         userId,
                         registerRequestDTO.name(),
@@ -356,7 +348,8 @@ public class UsersController {
     }
 
     @DeleteMapping("/{uuid}")
-    @Operation(summary = "Delete user", description = "Delete a user (Restricted to admins. Users cannot delete themselves).")
+    @Operation(summary = "Delete user", description = "Delete a user (Restricted to admins. Users cannot delete " +
+            "themselves).")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -450,7 +443,7 @@ public class UsersController {
             throw new SelfDelectionException();
         }
 
-        deleteUserUseCase.execute(uuid);
+        userService.deleteUser(uuid);
 
         return ResponseEntity.ok(
                 new SuccessResponseDTO<>(
@@ -460,7 +453,8 @@ public class UsersController {
     }
 
     @PostMapping("/{uuid}/roles")
-    @Operation(summary = "Assign role", description = "Assign a new role to a user (Restricted to admins. A user cannot be assigned a role they already have).")
+    @Operation(summary = "Assign role", description = "Assign a new role to a user (Restricted to admins. A user " +
+            "cannot be assigned a role they already have).")
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -563,7 +557,7 @@ public class UsersController {
     ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        UserEntity updatedUser = assignRoleUseCase.execute(assignRoleRequestDTO, uuid);
+        UserEntity updatedUser = userService.assignRole(assignRoleRequestDTO, uuid);
 
         return ResponseEntity.ok(
                 new SuccessResponseDTO<>(
@@ -572,4 +566,6 @@ public class UsersController {
                 )
         );
     }
+
+
 }

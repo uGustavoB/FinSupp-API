@@ -1,14 +1,13 @@
 package com.ugustavob.finsuppapi.controllers;
 
+import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.users.LoginRequestDTO;
 import com.ugustavob.finsuppapi.dto.users.LoginResponseDTO;
 import com.ugustavob.finsuppapi.dto.users.RegisterRequestDTO;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.security.TokenService;
-import com.ugustavob.finsuppapi.useCases.user.CreateUserUseCase;
-import com.ugustavob.finsuppapi.useCases.user.LoginUserUseCase;
+import com.ugustavob.finsuppapi.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,9 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "Auth", description = "Endpoints for login and register")
 public class AuthController {
-    private final LoginUserUseCase loginUserUseCase;
     private final TokenService tokenService;
-    private final CreateUserUseCase createUserUseCase;
+    private final UserService userService;
 
     @Operation(
             summary = "Login",
@@ -94,7 +92,7 @@ public class AuthController {
             @Parameter(description = "Email and password", required = true)
             @Valid @RequestBody LoginRequestDTO loginRequest
     ) {
-        UserEntity user = loginUserUseCase.execute(loginRequest);
+        UserEntity user = userService.loginUser(loginRequest);
         String token = tokenService.generateToken(user);
 
         return ResponseEntity.ok(
@@ -179,7 +177,7 @@ public class AuthController {
             @Parameter(description = "Name, email and password", required = true)
             @Valid @RequestBody RegisterRequestDTO body
     ) {
-        UserEntity newUser = createUserUseCase.execute(body);
+        UserEntity newUser = userService.createUser(body);
         String token = tokenService.generateToken(newUser);
 
         return ResponseEntity.created(null).body(

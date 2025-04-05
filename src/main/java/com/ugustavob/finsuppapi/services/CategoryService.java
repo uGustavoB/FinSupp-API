@@ -42,7 +42,7 @@ public class CategoryService {
         Optional<CategoryEntity> category =
                 categoryRepository.findByDescription(createCategoryRequestDTO.description());
 
-        if (category.isEmpty()) {
+        if (category.isPresent()) {
             throw new CategoryDescriptionAlreadyExistsException(createCategoryRequestDTO.description());
         }
 
