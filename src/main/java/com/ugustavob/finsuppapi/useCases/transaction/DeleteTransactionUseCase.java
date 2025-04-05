@@ -3,6 +3,7 @@ package com.ugustavob.finsuppapi.useCases.transaction;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
+import com.ugustavob.finsuppapi.exception.BillNotFoundException;
 import com.ugustavob.finsuppapi.exception.BusinessException;
 import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
@@ -44,9 +45,8 @@ public class DeleteTransactionUseCase {
                 int month = Integer.parseInt(matcher.group(1));
                 int year = Integer.parseInt(matcher.group(2));
 
-                // Busca com tratamento adequado
                 BillEntity bill = billService.findByMonthAndYearAndUser(month, year, userId)
-                        .orElseThrow(() -> new BusinessException("Fatura correspondente não encontrada"));
+                        .orElseThrow(() -> new BillNotFoundException("Bill not found"));
 
                 billService.revertPayment(bill);
             }

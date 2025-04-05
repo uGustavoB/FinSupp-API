@@ -205,4 +205,8 @@ public class TransactionService {
             accountRepository.save(transactionEntityFinder.getRecipientAccount());
         }
     }
+
+    public boolean isCategoryAssociatedWithTransaction(int id) {
+        return transactionRepository.existsByCategoryId(id);
+    }
 }

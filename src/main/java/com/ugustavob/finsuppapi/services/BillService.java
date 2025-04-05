@@ -50,7 +50,8 @@ public class BillService {
     public BillItemResponseDTO billItemEntityToResponseDto(BillItemEntity billItem) {
         return new BillItemResponseDTO(
                 billItem.getId(),
-                billItem.getTransaction() != null ? billItem.getTransaction().getDescription() : billItem.getSubscription().getDescription(),
+                billItem.getTransaction() != null ? billItem.getTransaction().getDescription() :
+                        billItem.getSubscription().getDescription() + " Subscription",
                 billItem.getAmount(),
                 billItem.getInstallmentNumber(),
                 billItem.getBill().getId(),
@@ -116,7 +117,6 @@ public class BillService {
 
     @Transactional
     public void addSubscriptionToBill(SubscriptionEntity subscription) {
-        // Validações
         if (subscription == null || subscription.getCard() == null || subscription.getCard().getAccount() == null) {
             throw new IllegalArgumentException("Subscription, card or account cannot be null");
         }
@@ -126,9 +126,6 @@ public class BillService {
 
         LocalDate now = LocalDate.now();
         LocalDate startDate = now.withDayOfMonth(account.getClosingDay()).plusDays(1);
-
-        LocalDate endDate = startDate.plusMonths(1).withDayOfMonth(account.getClosingDay());
-        LocalDate dueDate = endDate.withDayOfMonth(account.getPaymentDueDay());
 
         int totalInstallments = switch (subscription.getInterval()) {
             case MONTHLY -> 1;

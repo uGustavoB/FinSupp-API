@@ -7,9 +7,6 @@ import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.exception.CategoryNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.CategoryService;
-import com.ugustavob.finsuppapi.useCases.category.CreateCategoryUseCase;
-import com.ugustavob.finsuppapi.useCases.category.DeleteCategoryUseCase;
-import com.ugustavob.finsuppapi.useCases.category.UpdateCategoryUseCase;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,9 +25,6 @@ import java.util.UUID;
 @Tag(name = "Categories", description = "Endpoints for categories management")
 @RequestMapping("/categories")
 public class CategoryController {
-    private final CreateCategoryUseCase createCategoryUseCase;
-    private final UpdateCategoryUseCase updateCategoryUseCase;
-    private final DeleteCategoryUseCase deleteCategoryUseCase;
     private final BaseService baseService;
     private final CategoryService categoryService;
 
@@ -82,7 +76,7 @@ public class CategoryController {
     ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        CategoryEntity categoryEntity = createCategoryUseCase.execute(createCategoryRequestDTO);
+        CategoryEntity categoryEntity = categoryService.createCategory(createCategoryRequestDTO);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -106,7 +100,8 @@ public class CategoryController {
     ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        CategoryEntity updatedCategory = updateCategoryUseCase.execute(updateCategoryRequestDTO, categoryService.getCategoryById(id));
+        CategoryEntity updatedCategory = categoryService.updateCategory(updateCategoryRequestDTO,
+                categoryService.getCategoryById(id));
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Category updated",
@@ -123,7 +118,7 @@ public class CategoryController {
     ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        deleteCategoryUseCase.execute(id);
+        categoryService.deleteCategory(id);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Category deleted"
