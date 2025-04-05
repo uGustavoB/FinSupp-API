@@ -11,16 +11,14 @@ import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
-import com.ugustavob.finsuppapi.exception.AccountNotFoundException;
-import com.ugustavob.finsuppapi.exception.CardNotFoundException;
-import com.ugustavob.finsuppapi.exception.CategoryNotFoundException;
-import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
+import com.ugustavob.finsuppapi.exception.*;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.repositories.CardRepository;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +28,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -117,6 +117,107 @@ public class TransactionService {
     }
 
     @Transactional
+    public TransactionEntity createTransaction(@Valid CreateTransactionRequestDTO createTransactionRequestDTO,
+                                           UUID userId) {
+        TransactionEntityFinder transactionEntityFinder = getAndValidateTransactionEntities(createTransactionRequestDTO);
+
+        TransactionEntity newTransaction = getTransactionEntity(createTransactionRequestDTO,
+                transactionEntityFinder);
+
+        if (!newTransaction.getCard().getAccount().getUser().getId().equals(userId)) {
+            throw new CardNotFoundException();
+        }
+
+        TransactionType type = createTransactionRequestDTO.type();
+        Double accountBalance = transactionEntityFinder.getCard().getAccount().getBalance();
+        Double transactionAmount = createTransactionRequestDTO.amount();
+
+        if (type == TransactionType.TRANSFER && accountBalance.compareTo(transactionAmount) < 0) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
+
+        transactionEntityFinder = updateAccountBalance(newTransaction, transactionEntityFinder);
+        saveAccounts(transactionEntityFinder, type);
+
+        TransactionEntity transaction =  transactionRepository.save(newTransaction);
+
+        billService.addTransactionToBill(transaction);
+
+        return transaction;
+    }
+
+    @Transactional
+    public TransactionEntity updateTransaction(Integer id, CreateTransactionRequestDTO createTransactionRequestDTO) {
+        var transaction = transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
+
+        TransactionEntityFinder transactionEntityFinder = getAndValidateTransactionEntities(createTransactionRequestDTO);
+
+        transactionEntityFinder = revertAccountBalance(transaction, transactionEntityFinder);
+        billService.revertTransactionBills(transaction);
+
+        transaction.setDescription(StringFormatUtil.toTitleCase(createTransactionRequestDTO.description()));
+        transaction.setAmount(createTransactionRequestDTO.amount());
+        transaction.setTransactionType(createTransactionRequestDTO.type());
+        transaction.setTransactionDate(createTransactionRequestDTO.transactionDate());
+        transaction.setCategory(transactionEntityFinder.getCategory());
+        transaction.setCard(transactionEntityFinder.getCard());
+        transaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
+
+        if (createTransactionRequestDTO.installments() != null) {
+            transaction.setInstallments(createTransactionRequestDTO.installments());
+        } else {
+            transaction.setInstallments(0);
+        }
+
+        TransactionType type = createTransactionRequestDTO.type();
+
+        transactionEntityFinder = updateAccountBalance(transaction, transactionEntityFinder);
+        billService.addTransactionToBill(transaction);
+
+        saveAccounts(transactionEntityFinder, type);
+
+        return transactionRepository.save(transaction);
+    }
+
+    @Transactional
+    public void deleteTransaction(Integer id, UUID userId) {
+        TransactionEntity transaction = transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
+
+        if (!transaction.getCard().getAccount().getUser().getId().equals(userId)) {
+            throw new BusinessException("Transaction does not belong to the user");
+        };
+
+        if (transactionRepository.existsBillWithTransactionId(transaction.getId())) {
+            throw new BusinessException("Transaction cannot be deleted");
+        }
+
+        if (transaction.getDescription().startsWith("Payment of the bill: ")) {
+            String description = transaction.getDescription().replace("Payment of the bill: ", "");
+            Matcher matcher = Pattern.compile("(\\d{2})/(\\d{4})$").matcher(description);
+            if (matcher.find()) {
+                int month = Integer.parseInt(matcher.group(1));
+                int year = Integer.parseInt(matcher.group(2));
+
+                BillEntity bill = billService.findByMonthAndYearAndUser(month, year, userId)
+                        .orElseThrow(() -> new BillNotFoundException("Bill not found"));
+
+                billService.revertPayment(bill);
+            }
+        }
+
+        billService.revertTransactionBills(transaction);
+        transactionRepository.delete(transaction);
+
+        TransactionEntityFinder transactionEntityFinder =
+                getAndValidateTransactionEntities(transaction.getCard(),
+                        transaction.getRecipientAccount());
+
+        transactionEntityFinder = revertAccountBalance(transaction, transactionEntityFinder);
+
+        saveAccounts(transactionEntityFinder, transaction.getTransactionType());
+    }
+
+    @Transactional
     public TransactionEntityFinder updateAccountBalance(
             TransactionEntity transaction,
             TransactionEntityFinder transactionEntityFinder
@@ -162,7 +263,6 @@ public class TransactionService {
                         transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() - transaction.getAmount());
                     }
                 } else {
-//                  Gustavo - Consertar depois, para adicionar o valor na fatura
                     throw new IllegalArgumentException("You can't transfer with a credit card");
                 }
                 break;

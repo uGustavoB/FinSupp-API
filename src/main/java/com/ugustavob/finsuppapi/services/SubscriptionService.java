@@ -60,12 +60,10 @@ public class SubscriptionService {
         CardEntity card = cardService.getCardById(createSubscriptionRequestDTO.cardId(), userId);
 
         if (createSubscriptionRequestDTO.status() == SubscriptionStatus.INACTIVE && subscription.getStatus() != createSubscriptionRequestDTO.status()) {
-            System.out.println("Subscription is inactive");
             billService.removeSubscriptionFromBill(subscription);
         }
 
         if (createSubscriptionRequestDTO.status() == SubscriptionStatus.ACTIVE && subscription.getStatus() != createSubscriptionRequestDTO.status()) {
-            System.out.println("Subscription is active");
             billService.addSubscriptionToBill(subscription);
         }
 

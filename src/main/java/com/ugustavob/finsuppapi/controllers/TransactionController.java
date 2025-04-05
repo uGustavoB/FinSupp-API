@@ -7,9 +7,6 @@ import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.TransactionService;
-import com.ugustavob.finsuppapi.useCases.transaction.CreateTransactionUseCase;
-import com.ugustavob.finsuppapi.useCases.transaction.DeleteTransactionUseCase;
-import com.ugustavob.finsuppapi.useCases.transaction.UpdateTransactionUseCase;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,9 +29,6 @@ import java.util.UUID;
 public class TransactionController {
     private final TransactionService transactionService;
     private final BaseService baseService;
-    private final CreateTransactionUseCase createTransactionUseCase;
-    private final UpdateTransactionUseCase updateTransactionUseCase;
-    private final DeleteTransactionUseCase deleteTransactionUseCase;
 
     @GetMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -79,7 +73,7 @@ public class TransactionController {
     public ResponseEntity<?> createTransaction(@Valid @RequestBody CreateTransactionRequestDTO createTransactionRequestDTO, HttpServletRequest request) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        TransactionEntity transaction = createTransactionUseCase.execute(createTransactionRequestDTO, userId);
+        TransactionEntity transaction = transactionService.createTransaction(createTransactionRequestDTO, userId);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -100,7 +94,7 @@ public class TransactionController {
     public ResponseEntity<?> updateTransaction(@PathVariable int id, @Valid @RequestBody CreateTransactionRequestDTO createTransactionRequestDTO, HttpServletRequest request) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        TransactionEntity transaction = updateTransactionUseCase.execute(id, createTransactionRequestDTO);
+        TransactionEntity transaction = transactionService.updateTransaction(id, createTransactionRequestDTO);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -121,7 +115,7 @@ public class TransactionController {
     public ResponseEntity<?> deleteTransaction(@PathVariable int id, HttpServletRequest request) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        deleteTransactionUseCase.execute(id, userId);
+        transactionService.deleteTransaction(id, userId);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Transaction deleted"

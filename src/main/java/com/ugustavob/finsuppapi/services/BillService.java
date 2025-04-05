@@ -177,11 +177,6 @@ public class BillService {
     public void removeSubscriptionFromBill(SubscriptionEntity subscription) {
         List<BillItemEntity> bills = billItemRepository.findBySubscription(subscription);
 
-        bills.forEach(bill -> {
-            System.out.println("Bill ID: " + bill.getBill().getId());
-            System.out.println("Bill Item ID: " + bill.getId());
-        });
-
         removeEntityFromBill(bills);
     }
 
