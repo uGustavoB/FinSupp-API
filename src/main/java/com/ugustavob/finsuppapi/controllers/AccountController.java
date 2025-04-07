@@ -1,18 +1,23 @@
 package com.ugustavob.finsuppapi.controllers;
 
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
+import com.ugustavob.finsuppapi.dto.accounts.AccountFilterDTO;
 import com.ugustavob.finsuppapi.dto.accounts.AccountResponseDTO;
 import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
+import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.services.AccountService;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.UserService;
+import com.ugustavob.finsuppapi.specifications.AccountSpecification;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -49,16 +54,19 @@ public class AccountController {
     @GetMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> getAccounts(HttpServletRequest request) {
+    public ResponseEntity<?> getAccounts(
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String bank,
+            @RequestParam(required = false) AccountType accountType,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request
+    ) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        userService.validateUserByIdAndReturn(userId);
+        AccountFilterDTO filter = new AccountFilterDTO(userId, description, bank, accountType);
 
-        ArrayList<AccountResponseDTO> accounts = new ArrayList<>();
-
-        accountRepository.findAllByUserId(userId).forEach(accountEntity -> accounts.add(
-                accountService.entityToResponseDto(accountEntity)
-        ));
+        Page<AccountResponseDTO> accounts = accountService.findAll(filter, page, size);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Accounts found",

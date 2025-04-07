@@ -106,6 +106,10 @@ public class TransactionService {
 
         Page<TransactionEntity> transactionsPage = transactionRepository.findAll(specification, pageable);
 
+        if (transactionsPage.isEmpty()) {
+            throw new TransactionNotFoundException();
+        }
+
         return transactionsPage.map(this::entityToResponseDto);
     }
 

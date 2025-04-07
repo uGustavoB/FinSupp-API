@@ -65,10 +65,6 @@ public class TransactionController {
 
         Page<TransactionResponseDTO> transactions = transactionService.getAllTransactionsFromUser(filter, page, size);
 
-        if (transactions.isEmpty()) {
-            throw new TransactionNotFoundException();
-        }
-
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Transactions retrieved",
                 transactions

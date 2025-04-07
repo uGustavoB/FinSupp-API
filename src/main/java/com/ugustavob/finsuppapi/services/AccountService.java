@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.services;
 
+import com.ugustavob.finsuppapi.dto.accounts.AccountFilterDTO;
 import com.ugustavob.finsuppapi.dto.accounts.AccountResponseDTO;
 import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
@@ -12,8 +13,13 @@ import com.ugustavob.finsuppapi.exception.UserNotFoundException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import com.ugustavob.finsuppapi.repositories.UserRepository;
+import com.ugustavob.finsuppapi.specifications.AccountSpecification;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -95,6 +101,20 @@ public class AccountService {
         }
 
         return accountEntity.get();
+    }
+
+    public Page<AccountResponseDTO> findAll(AccountFilterDTO filter, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<AccountEntity> specification = AccountSpecification.filter(filter);
+
+        Page<AccountEntity> accountPage = accountRepository.findAll(specification, pageable);
+
+        if (accountPage.isEmpty()) {
+            throw new AccountNotFoundException("No accounts found");
+        }
+
+        return accountPage.map(this::entityToResponseDto);
     }
 
     public AccountResponseDTO entityToResponseDto(AccountEntity accountEntity) {
