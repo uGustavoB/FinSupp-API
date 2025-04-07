@@ -1,9 +1,11 @@
 package com.ugustavob.finsuppapi.controllers;
 
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
+import com.ugustavob.finsuppapi.dto.card.CardFilterDTO;
 import com.ugustavob.finsuppapi.dto.card.CardResponseDTO;
 import com.ugustavob.finsuppapi.dto.card.CreateCardRequestDTO;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
+import com.ugustavob.finsuppapi.entities.card.CardType;
 import com.ugustavob.finsuppapi.repositories.CardRepository;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.CardService;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -47,10 +50,20 @@ public class CardController {
     @GetMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> getAllCards(HttpServletRequest request) {
+    public ResponseEntity<?> getAllCards(
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String lastNumbers,
+            @RequestParam(required = false) CardType type,
+            @RequestParam(required = false) Integer accountId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            HttpServletRequest request
+    ) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        List<CardResponseDTO> cards = cardService.findAllByUser(userId);
+        CardFilterDTO filter = new CardFilterDTO(userId, description,lastNumbers,type, accountId);
+
+        Page<CardResponseDTO> cards = cardService.findAll(filter, page, size);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Cards retrieved successfully",

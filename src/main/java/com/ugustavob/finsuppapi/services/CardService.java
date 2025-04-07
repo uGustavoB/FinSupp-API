@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.services;
 
+import com.ugustavob.finsuppapi.dto.card.CardFilterDTO;
 import com.ugustavob.finsuppapi.dto.card.CardResponseDTO;
 import com.ugustavob.finsuppapi.dto.card.CreateCardRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
@@ -8,8 +9,13 @@ import com.ugustavob.finsuppapi.exception.CardAlreadyExistsException;
 import com.ugustavob.finsuppapi.exception.CardNotFoundException;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.repositories.CardRepository;
+import com.ugustavob.finsuppapi.specifications.CardSpecification;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.smartcardio.Card;
@@ -77,6 +83,20 @@ public class CardService {
         }
 
         return card;
+    }
+
+    public Page<CardResponseDTO> findAll(CardFilterDTO filter, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<CardEntity> specification = CardSpecification.filter(filter);
+
+        Page<CardEntity> cardPage = cardRepository.findAll(specification, pageable);
+
+        if (cardPage.isEmpty()) {
+            throw new CardNotFoundException("No cards found");
+        }
+
+        return cardPage.map(CardEntity::entityToResponseDTO);
     }
 
     public List<CardResponseDTO> findAllByUser(UUID userId) {
