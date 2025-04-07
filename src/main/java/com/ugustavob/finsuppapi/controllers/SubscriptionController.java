@@ -2,7 +2,10 @@ package com.ugustavob.finsuppapi.controllers;
 
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.subscription.CreateSubscriptionRequestDTO;
+import com.ugustavob.finsuppapi.dto.subscription.SubscriptionFilterDTO;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
+import com.ugustavob.finsuppapi.entities.subscription.SubscriptionInterval;
+import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
 import com.ugustavob.finsuppapi.repositories.SubscriptionRepository;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.SubscriptionService;
@@ -48,13 +51,27 @@ public class SubscriptionController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> getAllSubscriptions(
+            @RequestParam(required = false) Integer accountId,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) SubscriptionInterval interval,
+            @RequestParam(required = false) SubscriptionStatus status,
+            @RequestParam(required = false) Integer cardId,
             @RequestParam(defaultValue = "0", required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
             HttpServletRequest request
     ) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        var subscriptions = subscriptionService.getAllSubscriptionsFromUser(userId, page, size);
+        SubscriptionFilterDTO filter = new SubscriptionFilterDTO(
+                userId,
+                accountId,
+                description,
+                interval,
+                status,
+                cardId
+        );
+
+        var subscriptions = subscriptionService.getAllSubscriptionsFromUser(filter, page, size);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Subscriptions retrieved",

@@ -1,15 +1,22 @@
 package com.ugustavob.finsuppapi.services;
 
 import com.ugustavob.finsuppapi.dto.subscription.CreateSubscriptionRequestDTO;
+import com.ugustavob.finsuppapi.dto.subscription.SubscriptionFilterDTO;
 import com.ugustavob.finsuppapi.dto.subscription.SubscriptionResponseDTO;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
+import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.exception.SubscriptionNotFoundException;
 import com.ugustavob.finsuppapi.repositories.SubscriptionRepository;
+import com.ugustavob.finsuppapi.specifications.SubscriptionSpecification;
+import com.ugustavob.finsuppapi.specifications.TransactionSpecification;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -49,9 +56,18 @@ public class SubscriptionService {
         return subscription;
     }
 
-    public Page<SubscriptionResponseDTO> getAllSubscriptionsFromUser(UUID userId, int page, int size) {
-        return subscriptionRepository.findAllByCard_Account_User_Id(userId, org.springframework.data.domain.PageRequest.of(page, size))
-                .map(SubscriptionEntity::entityToResponseDTO);
+    public Page<SubscriptionResponseDTO> getAllSubscriptionsFromUser(SubscriptionFilterDTO filter, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Specification<SubscriptionEntity> specification = SubscriptionSpecification.filter(filter);
+
+        Page<SubscriptionEntity> subscriptionPage = subscriptionRepository.findAll(specification, pageable);
+
+        if (subscriptionPage.isEmpty()) {
+            throw new SubscriptionNotFoundException("No subscriptions found");
+        }
+
+        return subscriptionPage.map(SubscriptionEntity::entityToResponseDTO);
     }
 
     public SubscriptionEntity updateSubscription(Integer id, @Valid CreateSubscriptionRequestDTO createSubscriptionRequestDTO, UUID userId) {
