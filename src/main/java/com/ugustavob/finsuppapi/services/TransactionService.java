@@ -1,6 +1,7 @@
 package com.ugustavob.finsuppapi.services;
 
 import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
+import com.ugustavob.finsuppapi.dto.transactions.TransactionFilterDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountType;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
@@ -16,6 +17,7 @@ import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.repositories.CardRepository;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import com.ugustavob.finsuppapi.repositories.TransactionRepository;
+import com.ugustavob.finsuppapi.specifications.TransactionSpecification;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -23,9 +25,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -95,9 +99,12 @@ public class TransactionService {
         return newTransaction;
     }
 
-    public Page<TransactionResponseDTO> getAllTransactionsFromUser(UUID userId, int page, int size) {
+    public Page<TransactionResponseDTO> getAllTransactionsFromUser(TransactionFilterDTO filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<TransactionEntity> transactionsPage = transactionRepository.findByUserId(userId, pageable);
+
+        Specification<TransactionEntity> specification = TransactionSpecification.filter(filter);
+
+        Page<TransactionEntity> transactionsPage = transactionRepository.findAll(specification, pageable);
 
         return transactionsPage.map(this::entityToResponseDto);
     }

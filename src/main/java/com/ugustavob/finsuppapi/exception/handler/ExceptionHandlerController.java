@@ -169,8 +169,12 @@ public class ExceptionHandlerController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
+    public ResponseEntity<ErrorResponseDTO> handleException(Exception e) {
         log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
+        return ResponseEntity.internalServerError().body(new ErrorResponseDTO(
+                "An unexpected error occurred",
+                "Error",
+                null
+        ));
     }
 }

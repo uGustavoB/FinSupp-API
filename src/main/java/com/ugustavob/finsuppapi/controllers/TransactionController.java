@@ -2,8 +2,10 @@ package com.ugustavob.finsuppapi.controllers;
 
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
+import com.ugustavob.finsuppapi.dto.transactions.TransactionFilterDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
+import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
 import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.TransactionService;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -34,16 +37,36 @@ public class TransactionController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> getAllTransactions(
+            @RequestParam(required = false) Integer accountId,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) Integer installments,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) TransactionType transactionType,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Integer cardId,
             @RequestParam(defaultValue = "0", required = false) int page ,
             @RequestParam(defaultValue = "10", required = false) int size,
             HttpServletRequest request
     ) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        Page<TransactionResponseDTO> transactions = transactionService.getAllTransactionsFromUser(userId, page, size);
+        TransactionFilterDTO filter = new TransactionFilterDTO(
+                userId,
+                accountId,
+                description,
+                installments,
+                startDate,
+                endDate,
+                transactionType,
+                categoryId,
+                cardId
+        );
 
-        if (transactions.getTotalElements() > 0) {
-            throw new TransactionNotFoundException("No transactions found");
+        Page<TransactionResponseDTO> transactions = transactionService.getAllTransactionsFromUser(filter, page, size);
+
+        if (transactions.isEmpty()) {
+            throw new TransactionNotFoundException();
         }
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(

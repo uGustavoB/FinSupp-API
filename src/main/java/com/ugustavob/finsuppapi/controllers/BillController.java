@@ -38,7 +38,7 @@ public class BillController {
     private final TransactionService transactionService;
     private final BillRepository billRepository;
 
-    @GetMapping("/search")
+    @GetMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> searchBills(
