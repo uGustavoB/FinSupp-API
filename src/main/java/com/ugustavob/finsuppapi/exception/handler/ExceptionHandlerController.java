@@ -78,6 +78,12 @@ public class ExceptionHandlerController {
                 HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(AccountCannotBeDeletedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAccountCannotBeDeletedException(AccountCannotBeDeletedException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+                HttpStatus.CONFLICT);
+    }
+
 //  Category Exceptions
     @ExceptionHandler(CategoryDescriptionAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleCategoryDescriptionAlreadyExistsException(CategoryDescriptionAlreadyExistsException e) {

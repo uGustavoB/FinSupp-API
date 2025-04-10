@@ -6,11 +6,9 @@ import com.ugustavob.finsuppapi.dto.subscription.SubscriptionResponseDTO;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
-import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.exception.SubscriptionNotFoundException;
 import com.ugustavob.finsuppapi.repositories.SubscriptionRepository;
 import com.ugustavob.finsuppapi.specifications.SubscriptionSpecification;
-import com.ugustavob.finsuppapi.specifications.TransactionSpecification;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,8 +23,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
-    private final CardService cardService;
     private final BillService billService;
+    private final CardService cardService;
 
     public SubscriptionEntity createSubscription(CreateSubscriptionRequestDTO createSubscriptionRequestDTO, UUID userId) {
         CardEntity card = cardService.getCardById(createSubscriptionRequestDTO.cardId(), userId);
@@ -68,6 +66,10 @@ public class SubscriptionService {
         }
 
         return subscriptionPage.map(SubscriptionEntity::entityToResponseDTO);
+    }
+
+    public boolean isAccountHaveSubscriptions(Integer accountId) {
+        return subscriptionRepository.existsByAccountId(accountId);
     }
 
     public SubscriptionEntity updateSubscription(Integer id, @Valid CreateSubscriptionRequestDTO createSubscriptionRequestDTO, UUID userId) {

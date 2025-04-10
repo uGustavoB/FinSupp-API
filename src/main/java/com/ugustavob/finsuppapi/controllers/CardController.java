@@ -4,9 +4,11 @@ import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.card.CardFilterDTO;
 import com.ugustavob.finsuppapi.dto.card.CardResponseDTO;
 import com.ugustavob.finsuppapi.dto.card.CreateCardRequestDTO;
+import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.card.CardType;
 import com.ugustavob.finsuppapi.repositories.CardRepository;
+import com.ugustavob.finsuppapi.services.AccountService;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.CardService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,9 +30,9 @@ import java.util.UUID;
 @Tag(name = "4. Card", description = "Card management")
 @RequiredArgsConstructor
 public class CardController {
-    private final CardRepository cardRepository;
     private final CardService cardService;
     private final BaseService baseService;
+    private final AccountService accountService;
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
@@ -77,7 +79,10 @@ public class CardController {
                                      HttpServletRequest request) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        CardEntity card = cardService.createCard(createCardRequestDTO, userId);
+        AccountEntity account = accountService.getAccountByIdAndCompareWithUserId(createCardRequestDTO.accountId(),
+                userId);
+
+        CardEntity card = cardService.createCard(createCardRequestDTO, account);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -112,6 +117,8 @@ public class CardController {
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> deleteCard(@PathVariable int id, HttpServletRequest request) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+
+        accountService.isAccountHaveTransactionsOrSubscriptions(id);
 
         cardService.deleteCard(id, userId);
 

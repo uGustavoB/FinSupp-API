@@ -7,7 +7,6 @@ import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.exception.CardAlreadyExistsException;
 import com.ugustavob.finsuppapi.exception.CardNotFoundException;
-import com.ugustavob.finsuppapi.repositories.AccountRepository;
 import com.ugustavob.finsuppapi.repositories.CardRepository;
 import com.ugustavob.finsuppapi.specifications.CardSpecification;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
@@ -18,21 +17,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.smartcardio.Card;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CardService {
     private final CardRepository cardRepository;
-    private final AccountRepository accountRepository;
-    private final AccountService accountService;
 
-    public CardEntity createCard(CreateCardRequestDTO createCardRequestDTO, UUID userId) {
-        AccountEntity account = accountService.getAccountByIdAndCompareWithUserId(createCardRequestDTO.accountId(), userId);
-
+    public CardEntity createCard(CreateCardRequestDTO createCardRequestDTO, AccountEntity account) {
         if (cardRepository.findByDescription(createCardRequestDTO.description()).isPresent()) {
             throw new CardAlreadyExistsException();
         }
@@ -97,15 +89,5 @@ public class CardService {
         }
 
         return cardPage.map(CardEntity::entityToResponseDTO);
-    }
-
-    public List<CardResponseDTO> findAllByUser(UUID userId) {
-        List<AccountEntity> accounts = accountRepository.findAllByUserId(userId);
-        List<CardResponseDTO> cards = new ArrayList<>();
-        accounts.forEach(accountEntity -> {
-            List<CardEntity> cardList = cardRepository.findAllByAccountId(accountEntity.getId());
-            cardList.forEach(cardEntity -> cards.add(cardEntity.entityToResponseDTO()));
-        });
-        return cards;
     }
 }

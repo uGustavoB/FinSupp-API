@@ -4,14 +4,9 @@ import com.ugustavob.finsuppapi.dto.accounts.AccountFilterDTO;
 import com.ugustavob.finsuppapi.dto.accounts.AccountResponseDTO;
 import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
-import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
-import com.ugustavob.finsuppapi.exception.AccountAlreadyExistsException;
-import com.ugustavob.finsuppapi.exception.AccountNotFoundException;
-import com.ugustavob.finsuppapi.exception.CategoryDescriptionAlreadyExistsException;
-import com.ugustavob.finsuppapi.exception.UserNotFoundException;
+import com.ugustavob.finsuppapi.exception.*;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
-import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import com.ugustavob.finsuppapi.repositories.UserRepository;
 import com.ugustavob.finsuppapi.specifications.AccountSpecification;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
@@ -30,6 +25,8 @@ import java.util.UUID;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final SubscriptionService subscriptionService;
+    private final TransactionService transactionService;
 
     public AccountEntity createAccount(CreateAccountRequestDTO createAccountRequestDTO, UserEntity userEntity) {
         Optional<AccountEntity> account = accountRepository.findByDescription(createAccountRequestDTO.description());
@@ -56,6 +53,8 @@ public class AccountService {
     }
 
     public void deleteAccount(Integer id) {
+        isAccountHaveTransactionsOrSubscriptions(id);
+
         accountRepository.deleteByIdAndReturnEntity(id)
                 .orElseThrow(AccountNotFoundException::new);
     }
@@ -115,6 +114,12 @@ public class AccountService {
         }
 
         return accountPage.map(this::entityToResponseDto);
+    }
+
+    public void isAccountHaveTransactionsOrSubscriptions(Integer accountId) {
+        if (subscriptionService.isAccountHaveSubscriptions(accountId) || transactionService.isAccountHaveTransactions(accountId)) {
+            throw new AccountCannotBeDeletedException();
+        }
     }
 
     public AccountResponseDTO entityToResponseDto(AccountEntity accountEntity) {

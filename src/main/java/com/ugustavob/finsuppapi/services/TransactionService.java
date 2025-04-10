@@ -3,14 +3,13 @@ package com.ugustavob.finsuppapi.services;
 import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionFilterDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
-import com.ugustavob.finsuppapi.entities.account.AccountType;
+import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.bill.BillEntity;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.card.CardType;
-import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
-import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
+import com.ugustavob.finsuppapi.entities.transaction.TransactionEntityFinder;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
 import com.ugustavob.finsuppapi.exception.*;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
@@ -29,8 +28,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,6 +94,10 @@ public class TransactionService {
         }
 
         return newTransaction;
+    }
+
+    public boolean isAccountHaveTransactions(Integer cardId) {
+        return transactionRepository.existsByAccountId(cardId);
     }
 
     public Page<TransactionResponseDTO> getAllTransactionsFromUser(TransactionFilterDTO filter, int page, int size) {

@@ -1,6 +1,5 @@
 package com.ugustavob.finsuppapi.repositories;
 
-import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,4 +39,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
     @Query("SELECT COUNT(t) > 0 FROM TransactionEntity t WHERE t.category.id = :categoryId")
     boolean existsByCategoryId(@Param("categoryId") Integer categoryId);
+
+    @Query("SELECT COUNT(t) > 0 FROM TransactionEntity t WHERE t.card.account.id = :accountId")
+    boolean existsByAccountId(@Param("accountId") Integer accountId);
 }
