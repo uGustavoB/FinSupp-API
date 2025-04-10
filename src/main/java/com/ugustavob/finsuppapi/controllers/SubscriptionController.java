@@ -6,7 +6,6 @@ import com.ugustavob.finsuppapi.dto.subscription.SubscriptionFilterDTO;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionInterval;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
-import com.ugustavob.finsuppapi.repositories.SubscriptionRepository;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.SubscriptionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -25,7 +24,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/subscriptions")
 @RequiredArgsConstructor
-@Tag(name = "Subscriptions", description = "Endpoints for subscriptions management")
+@Tag(name = "7. Subscriptions", description = "Endpoints for subscriptions management")
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final BaseService baseService;

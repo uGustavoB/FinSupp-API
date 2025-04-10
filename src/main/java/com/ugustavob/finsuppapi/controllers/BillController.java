@@ -29,7 +29,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/bills")
-@Tag(name = "Bill", description = "Endpoints for bill management")
+@Tag(name = "8. Bill", description = "Endpoints for bill management")
 @RequiredArgsConstructor
 public class BillController {
     private final BillService billService;

@@ -33,7 +33,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-@Tag(name = "Users", description = "Endpoints for users")
+@Tag(name = "2. Users", description = "Endpoints for users")
 public class UsersController {
     private final BaseService baseService;
     private final UserService userService;

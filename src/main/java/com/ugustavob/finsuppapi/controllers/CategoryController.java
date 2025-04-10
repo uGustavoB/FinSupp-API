@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@Tag(name = "Categories", description = "Endpoints for categories management")
+@Tag(name = "5. Categories", description = "Endpoints for categories management")
 @RequestMapping("/categories")
 public class CategoryController {
     private final BaseService baseService;
