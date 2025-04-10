@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.controllers;
 
+import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.accounts.AccountFilterDTO;
 import com.ugustavob.finsuppapi.dto.accounts.AccountResponseDTO;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -81,7 +83,7 @@ public class AccountController {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
-                                            implementation = SuccessResponseDTO.class
+                                            implementation = ErrorResponseDTO.class
                                     ),
                                     examples = {
                                             @ExampleObject(
@@ -99,37 +101,13 @@ public class AccountController {
                     }
             ),
             @ApiResponse(
-                    responseCode = "403",
-                    description = "User not authorized",
-                    content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(
-                                            implementation = SuccessResponseDTO.class
-                                    ),
-                                    examples = {
-                                            @ExampleObject(
-                                                    name = "User not authorized",
-                                                    value = """
-                                                            {
-                                                              "message": "Access Denied",
-                                                              "type": "Error"
-                                                            }
-                                                            """,
-                                                    summary = "User not authorized"
-                                            ),
-                                    }
-                            )
-                    }
-            ),
-            @ApiResponse(
                     responseCode = "404",
                     description = "Account not found",
                     content = {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
-                                            implementation = SuccessResponseDTO.class
+                                            implementation = ErrorResponseDTO.class
                                     ),
                                     examples = {
                                             @ExampleObject(
@@ -213,7 +191,7 @@ public class AccountController {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
-                                            implementation = SuccessResponseDTO.class
+                                            implementation = ErrorResponseDTO.class
                                     ),
                                     examples = {
                                             @ExampleObject(
@@ -231,37 +209,13 @@ public class AccountController {
                     }
             ),
             @ApiResponse(
-                    responseCode = "403",
-                    description = "User not authorized",
-                    content = {
-                            @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(
-                                            implementation = SuccessResponseDTO.class
-                                    ),
-                                    examples = {
-                                            @ExampleObject(
-                                                    name = "User not authorized",
-                                                    value = """
-                                                            {
-                                                              "message": "Access Denied",
-                                                              "type": "Error"
-                                                            }
-                                                            """,
-                                                    summary = "User not authorized"
-                                            ),
-                                    }
-                            )
-                    }
-            ),
-            @ApiResponse(
                     responseCode = "404",
                     description = "Account not found",
                     content = {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
-                                            implementation = SuccessResponseDTO.class
+                                            implementation = ErrorResponseDTO.class
                                     ),
                                     examples = {
                                             @ExampleObject(
@@ -344,7 +298,7 @@ public class AccountController {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
-                                            implementation = SuccessResponseDTO.class
+                                            implementation = ErrorResponseDTO.class
                                     ),
                                     examples = {
                                             @ExampleObject(
@@ -362,24 +316,80 @@ public class AccountController {
                     }
             ),
             @ApiResponse(
-                    responseCode = "403",
-                    description = "User not authorized",
+                    responseCode = "404",
+                    description = "Account not found",
                     content = {
                             @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
-                                            implementation = SuccessResponseDTO.class
+                                            implementation = ErrorResponseDTO.class
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "User not authorized",
+                                                    name = "Account not found",
                                                     value = """
                                                             {
-                                                              "message": "Access Denied",
+                                                              "message": "Account not found",
                                                               "type": "Error"
                                                             }
                                                             """,
-                                                    summary = "User not authorized"
+                                                    summary = "Account not found"
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Account already exists",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Account already exists",
+                                                    value = """
+                                                            {
+                                                              "message": "Account already exists! Please, try again with a different description.",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "Account already exists"
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Unprocessable Entity",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unprocessable Entity",
+                                                    value = """
+                                                            [
+                                                              {
+                                                                "message": "Closing day must be between 1 and 31",
+                                                                "type": "Error",
+                                                                "field": "ClosingDay"
+                                                              },
+                                                              {
+                                                                "message": "Agency number must be greater than or equal to 0",
+                                                                "type": "Error",
+                                                                "field": "Balance"
+                                                              }
+                                                            ]
+                                                            """,
+                                                    summary = "Unprocessable Entity"
                                             ),
                                     }
                             )
@@ -389,7 +399,7 @@ public class AccountController {
     @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
-    public ResponseEntity<?> createAccount(@RequestBody CreateAccountRequestDTO createAccountRequestDTO,
+    public ResponseEntity<?> createAccount(@Valid @RequestBody CreateAccountRequestDTO createAccountRequestDTO,
                                            HttpServletRequest request) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
@@ -409,11 +419,151 @@ public class AccountController {
         ));
     }
 
+    @Operation(summary = "Update an account")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account updated",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = SuccessResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Account updated",
+                                                    value = """
+                                                            {
+                                                              "message": "Account updated",
+                                                              "type": "Success",
+                                                              "data": {
+                                                                "id": 1,
+                                                                "description": "My Credit Account",
+                                                                "bank": "Banco Do Brasil",
+                                                                "accountType": "CHECKING",
+                                                                "closingDay": 3,
+                                                                "paymentDueDay": 10,
+                                                                "balance": 1000
+                                                              }
+                                                            }
+                                                            """,
+                                                    summary = "Account updated"
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unauthorized",
+                                                    value = """
+                                                            {
+                                                              "message": "Unauthorized",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "Unauthorized"
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Account not found",
+                                                    value = """
+                                                            {
+                                                              "message": "Account not found",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "Account not found"
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Account already exists",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Account already exists",
+                                                    value = """
+                                                            {
+                                                              "message": "Account already exists! Please, try again with a different description.",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "Account already exists"
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Unprocessable Entity",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unprocessable Entity",
+                                                    value = """
+                                                            [
+                                                              {
+                                                                "message": "Closing day must be between 1 and 31",
+                                                                "type": "Error",
+                                                                "field": "ClosingDay"
+                                                              },
+                                                              {
+                                                                "message": "Agency number must be greater than or equal to 0",
+                                                                "type": "Error",
+                                                                "field": "Balance"
+                                                              }
+                                                            ]
+                                                            """,
+                                                    summary = "Unprocessable Entity"
+                                            ),
+                                    }
+                            )
+                    }
+            )
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> updateAccount(@PathVariable Integer id,
-                                           @RequestBody CreateAccountRequestDTO createAccountRequestDTO,
+                                           @Valid @RequestBody CreateAccountRequestDTO createAccountRequestDTO,
                                            HttpServletRequest request) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
@@ -427,6 +577,105 @@ public class AccountController {
         ));
     }
 
+    @Operation(summary = "Delete an account")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Account deleted",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = SuccessResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Account deleted",
+                                                    value = """
+                                                            {
+                                                              "message": "Account deleted",
+                                                              "type": "Success"
+                                                            }
+                                                            """,
+                                                    summary = "Account deleted"
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unauthorized",
+                                                    value = """
+                                                            {
+                                                              "message": "Unauthorized",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "This occurs when the user is not authenticated."
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Account not found",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Account not found",
+                                                    value = """
+                                                            {
+                                                              "message": "Account not found",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "This occurs when no account is found."
+                                            ),
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Account cannot be deleted",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Account cannot be deleted",
+                                                    value = """
+                                                            {
+                                                              "message": "Account cannot be deleted because it has transactions or subscriptions associated with it.",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "This occurs when the account has transactions or subscriptions associated with it."
+                                            ),
+                                    }
+                            )
+                    }
+            )
+    })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")

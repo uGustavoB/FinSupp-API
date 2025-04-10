@@ -29,9 +29,11 @@ public class AccountService {
     private final TransactionService transactionService;
 
     public AccountEntity createAccount(CreateAccountRequestDTO createAccountRequestDTO, UserEntity userEntity) {
-        Optional<AccountEntity> account = accountRepository.findByDescription(createAccountRequestDTO.description());
+        boolean account =
+                accountRepository.existsByDescription(StringFormatUtil.toTitleCase(createAccountRequestDTO.description()),
+                        userEntity.getId());
 
-        if (account.isPresent()) {
+        if (account) {
             throw new AccountAlreadyExistsException();
         }
 
@@ -64,10 +66,11 @@ public class AccountService {
             throw new AccountNotFoundException("Account not found");
         }
 
-        if (!createAccountRequestDTO.description().equals(account.getDescription())) {
-            Optional<AccountEntity> existingAccountWithDescription =
-                    accountRepository.findByDescription(createAccountRequestDTO.description());
-            if (existingAccountWithDescription.isPresent() && !existingAccountWithDescription.get().getId().equals(account.getId())) {
+        if (!StringFormatUtil.toTitleCase(createAccountRequestDTO.description()).equals(account.getDescription())) {
+            boolean existingAccountWithDescription =
+                    accountRepository.existsByDescription(StringFormatUtil.toTitleCase(createAccountRequestDTO.description()),
+                            account.getUser().getId());
+            if (existingAccountWithDescription) {
                 throw new AccountAlreadyExistsException("Description already in use by another account");
             }
         }

@@ -4,6 +4,7 @@ import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,10 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Integer>
     Optional<AccountEntity> findById(Integer id);
     Optional<AccountEntity> findByUserId(UUID id);
 
-    Optional<AccountEntity> findByDescription(@NotBlank(message = "Account description is required") String description);
+    @Query("SELECT COUNT (t) > 0 FROM AccountEntity t WHERE t.description = :description AND t.user.id = :userId")
+    boolean existsByDescription(@NotBlank(message = "Account description is required") String description,
+                                      UUID userId);
+
     List<AccountEntity> findAllByUserId(UUID userId);
 
     boolean existsByUserId(UUID userId);
