@@ -1,6 +1,7 @@
 package com.ugustavob.finsuppapi.exception.handler;
 
 import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
+import com.ugustavob.finsuppapi.dto.execeptions.UnprocessableEntityExceptionDTO;
 import com.ugustavob.finsuppapi.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -27,150 +28,174 @@ public class ExceptionHandlerController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<ErrorResponseDTO>> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        List<ErrorResponseDTO> dto = new ArrayList<>();
+    public ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        List<Object> dto = new ArrayList<>();
 
-        e.getBindingResult().getFieldErrors().forEach(err -> {
-            String message = messageSource.getMessage(err, LocaleContextHolder.getLocale());
-
-            dto.add(new ErrorResponseDTO(message,"Error", err.getField().substring(0,1).toUpperCase() + err.getField().substring(1)));
+//        adiciona os erros de validação na lista, depois retorna um ErrorResponseDTO, como dataList, a lista de erros
+//        exemplos:
+//        {
+//            "message": "Account already exists! Please, try again with a different description.",
+//                "type": "Error"
+//            "dataList": [
+//            "message": "Closing day must be between 1 and 31",
+//                "field": "ClosingDay"
+//        },
+//        {
+//            "message": "Agency number must be greater than or equal to 0",
+//                "field": "Balance"
+//        }
+// ]
+//    }
+//        OBS: Usar UnprocessableEntityExceptionDTO
+        e.getFieldErrors().forEach(error -> {
+            dto.add(new UnprocessableEntityExceptionDTO(error.getField(), error.getDefaultMessage()));
         });
 
-        return new ResponseEntity<>(dto, HttpStatus.UNPROCESSABLE_ENTITY);
+        return new ResponseEntity<>(ErrorResponseDTO.builder()
+                .message("Validation error")
+                .code(422)
+                .type("Validation Error")
+                .dataList(dto)
+                .build(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ErrorResponseDTO> handleInvalidCredentialsException(InvalidCredentialsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(400).build(),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(SelfDelectionException.class)
     public ResponseEntity<ErrorResponseDTO> handleSelfDelectionException(SelfDelectionException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(403).build(),
+                HttpStatus.FORBIDDEN);
     }
 
 //  User Exceptions
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleUserNotFoundException(UserNotFoundException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(404).build(),
+                HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UserAlreadyHasRoleException.class)
     public ResponseEntity<ErrorResponseDTO> handleUserAlreadyHasRoleException(UserAlreadyHasRoleException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(400).build(),
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).field("Email").build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).field("Email").build(),
                 HttpStatus.CONFLICT);
     }
 
 //  Account Exceptions
     @ExceptionHandler(AccountAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccountAlreadyExistsException(AccountAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),
+                HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccountNotFoundException(AccountNotFoundException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(404).build(),
                 HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(AccountCannotBeDeletedException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccountCannotBeDeletedException(AccountCannotBeDeletedException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),
                 HttpStatus.CONFLICT);
     }
 
 //  Category Exceptions
     @ExceptionHandler(CategoryDescriptionAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleCategoryDescriptionAlreadyExistsException(CategoryDescriptionAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).field("Description").build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).field("Description").build(),
                 HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleCategoryNotFoundException(CategoryNotFoundException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(404).build(),
                 HttpStatus.NOT_FOUND);
     }
 
 //  Transaction Exceptions
     @ExceptionHandler(TransactionNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleTransactionNotFoundException(TransactionNotFoundException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(404).build(),
                 HttpStatus.NOT_FOUND);
     }
 
 //  Bill Exceptions
     @ExceptionHandler(BillNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleBillNotFoundException(BillNotFoundException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(404).build(),
                 HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BillAreadyPaidException.class)
     public ResponseEntity<ErrorResponseDTO> handleBillAreadyPaidException(BillAreadyPaidException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),
                 HttpStatus.CONFLICT);
     }
 
 //  Card Exceptions
     @ExceptionHandler(CardNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleCardNotFoundException(CardNotFoundException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(404).build(),
                 HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(CardAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleCardAlreadyExistsException(CardAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),
                 HttpStatus.CONFLICT);
     }
 
 //  Subscription Exceptions
     @ExceptionHandler(SubscriptionNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleSubscriptionNotFoundException(SubscriptionNotFoundException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(404).build(),
                 HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(SubscriptionAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleSubscriptionAlreadyExistsException(SubscriptionAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),
                 HttpStatus.CONFLICT);
     }
 
 //  Others Exceptions
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponseDTO> handleBusinessException(BusinessException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(422).build(),
                 HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(IllegalArgumentException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(400).build(),
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorResponseDTO> handleIllegalStateException(IllegalStateException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(400).build(),
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponseDTO> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getLocalizedMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getLocalizedMessage()).code(400).build(),
                 HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccessDeniedException(AccessDeniedException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(403).build(),
                 HttpStatus.FORBIDDEN);
     }
 
@@ -178,6 +203,7 @@ public class ExceptionHandlerController {
     public ResponseEntity<ErrorResponseDTO> handleException(Exception e) {
         log.error(e.getMessage());
         return ResponseEntity.internalServerError().body(new ErrorResponseDTO(
+                500,
                 "An unexpected error occurred",
                 "Error",
                 null
