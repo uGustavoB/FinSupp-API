@@ -87,7 +87,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Unauthorized",
+                                                    name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
                                                               "message": "Unauthorized",
@@ -111,7 +111,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Account not found",
+                                                    name = "This occurs when no account is found.",
                                                     value = """
                                                             {
                                                               "message": "Account not found",
@@ -195,7 +195,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Unauthorized",
+                                                    name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
                                                               "message": "Unauthorized",
@@ -219,7 +219,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Account not found",
+                                                    name = "This occurs when no account is found.",
                                                     value = """
                                                             {
                                                               "message": "Account not found",
@@ -302,7 +302,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Unauthorized",
+                                                    name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
                                                               "message": "Unauthorized",
@@ -326,7 +326,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Account not found",
+                                                    name = "This occurs when no account is found.",
                                                     value = """
                                                             {
                                                               "message": "Account not found",
@@ -350,7 +350,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Account already exists",
+                                                    name = "This happens when the account description already exists for the user.",
                                                     value = """
                                                             {
                                                               "message": "Account already exists! Please, try again with a different description.",
@@ -374,7 +374,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Unprocessable Entity",
+                                                    name = "This happens when the request is well-formed but contains semantic errors.",
                                                     value = """
                                                             [
                                                               {
@@ -465,7 +465,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Unauthorized",
+                                                    name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
                                                               "message": "Unauthorized",
@@ -489,7 +489,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Account not found",
+                                                    name = "This occurs when no account is found.",
                                                     value = """
                                                             {
                                                               "message": "Account not found",
@@ -513,7 +513,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Account already exists",
+                                                    name = "This happens when the account description already exists for the user.",
                                                     value = """
                                                             {
                                                               "message": "Account already exists! Please, try again with a different description.",
@@ -537,7 +537,7 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Unprocessable Entity",
+                                                    name = "This happens when the request is well-formed but contains semantic errors.",
                                                     value = """
                                                             [
                                                               {
@@ -614,14 +614,14 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Unauthorized",
+                                                    name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
                                                             """,
-                                                    summary = "This occurs when the user is not authenticated."
+                                                    summary = "Unauthorized"
                                             ),
                                     }
                             )
@@ -638,14 +638,14 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Account not found",
+                                                    name = "This occurs when no account is found.",
                                                     value = """
                                                             {
                                                               "message": "Account not found",
                                                               "type": "Error"
                                                             }
                                                             """,
-                                                    summary = "This occurs when no account is found."
+                                                    summary = "Account not found"
                                             ),
                                     }
                             )
@@ -662,14 +662,14 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "Account cannot be deleted",
+                                                    name = "This occurs when the account has transactions or subscriptions associated with it.",
                                                     value = """
                                                             {
                                                               "message": "Account cannot be deleted because it has transactions or subscriptions associated with it.",
                                                               "type": "Error"
                                                             }
                                                             """,
-                                                    summary = "This occurs when the account has transactions or subscriptions associated with it."
+                                                    summary = "Account cannot be deleted"
                                             ),
                                     }
                             )

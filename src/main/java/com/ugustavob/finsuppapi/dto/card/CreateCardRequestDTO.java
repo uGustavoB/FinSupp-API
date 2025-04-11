@@ -31,7 +31,8 @@ public record CreateCardRequestDTO(
         @NotNull(message = "Card type cannot be null")
         @Schema(
                 description = "Type of the card",
-                example = "CREDIT"
+                example = "CREDIT",
+                implementation = CardType.class
         )
         CardType cardType,
         @NotNull(message = "Account ID cannot be null")
