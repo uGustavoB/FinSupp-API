@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.controllers;
 
+import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.categories.CategoryResponseDTO;
 import com.ugustavob.finsuppapi.dto.categories.CreateCategoryRequestDTO;
@@ -7,9 +8,16 @@ import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.exception.CategoryNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +36,93 @@ public class CategoryController {
     private final BaseService baseService;
     private final CategoryService categoryService;
 
+    @Operation(summary = "Get all categories")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Categories found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = SuccessResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Success",
+                                            value = """
+                                                    {
+                                                      "message": "Categories found",
+                                                      "type": "Success",
+                                                      "dataList": [
+                                                        {
+                                                          "id": 1,
+                                                          "description": "Food"
+                                                        },
+                                                        {
+                                                          "id": 2,
+                                                          "description": "Transport"
+                                                        },
+                                                        {
+                                                          "id": 3,
+                                                          "description": "Health"
+                                                        }
+                                                      "pagination": {
+                                                        "currentPage": 0,
+                                                        "pageSize": 10,
+                                                        "totalPages": 1,
+                                                        "totalElements": 3
+                                                      }
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Unauthorized",
+                                            value = """
+                                                    {
+                                                      "code": 401,
+                                                      "message": "Unauthorized",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Categories not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Categories not found",
+                                            value = """
+                                                    {
+                                                      "code": 404,
+                                                      "message": "Categories not found",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @GetMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
@@ -50,6 +145,78 @@ public class CategoryController {
         ));
     }
 
+    @Operation(summary = "Get category by ID")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Category found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = SuccessResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Success",
+                                            value = """
+                                                    {
+                                                      "message": "Category found",
+                                                      "type": "Success",
+                                                      "data": {
+                                                        "id": 1,
+                                                        "description": "Food"
+                                                      }
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Unauthorized",
+                                            value = """
+                                                    {
+                                                      "code": 401,
+                                                      "message": "Unauthorized",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Category not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Category not found",
+                                            value = """
+                                                    {
+                                                      "code": 404,
+                                                      "message": "Category not found",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
@@ -67,11 +234,89 @@ public class CategoryController {
         ));
     }
 
+    @Operation(summary = "Create a new category")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Category created",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = SuccessResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Success",
+                                            value = """
+                                                    {
+                                                      "message": "Category created",
+                                                      "type": "Success",
+                                                      "data": {
+                                                        "id": 1,
+                                                        "description": "Food"
+                                                      }
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Unauthorized",
+                                            value = """
+                                                    {
+                                                      "code": 401,
+                                                      "message": "Unauthorized",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Unprocessable Entity",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Unprocessable Entity",
+                                            value = """
+                                                    {
+                                                      "code": 422,
+                                                      "message": "Validation error",
+                                                      "type": "Error",
+                                                      "dataList": [
+                                                        {
+                                                          "description": "description",
+                                                          "field": "Category name must be between 1 and 20 characters"
+                                                        }
+                                                      ]
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<SuccessResponseDTO<CategoryResponseDTO>> createCategory(
-            @RequestBody CreateCategoryRequestDTO createCategoryRequestDTO,
+            @Valid @RequestBody CreateCategoryRequestDTO createCategoryRequestDTO,
             HttpServletRequest request
     ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
@@ -90,12 +335,112 @@ public class CategoryController {
         ));
     }
 
+    @Operation(summary = "Update a category")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Category updated",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = SuccessResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Success",
+                                            value = """
+                                                    {
+                                                      "message": "Category updated",
+                                                      "type": "Success",
+                                                      "data": {
+                                                        "id": 1,
+                                                        "description": "Food"
+                                                      }
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Unauthorized",
+                                            value = """
+                                                    {
+                                                      "code": 401,
+                                                      "message": "Unauthorized",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Category not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Category not found",
+                                            value = """
+                                                    {
+                                                      "code": 404,
+                                                      "message": "Category not found",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Unprocessable Entity",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Unprocessable Entity",
+                                            value = """
+                                                    {
+                                                      "code": 422,
+                                                      "message": "Validation error",
+                                                      "type": "Error",
+                                                      "dataList": [
+                                                        {
+                                                          "description": "description",
+                                                          "field": "Category name must be between 1 and 20 characters"
+                                                        }
+                                                      ]
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<SuccessResponseDTO<CategoryResponseDTO>> updateCategory(
             @PathVariable Integer id,
-            @RequestBody CreateCategoryRequestDTO updateCategoryRequestDTO,
+            @Valid @RequestBody CreateCategoryRequestDTO updateCategoryRequestDTO,
             HttpServletRequest request
     ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
@@ -109,6 +454,74 @@ public class CategoryController {
         ));
     }
 
+    @Operation(summary = "Delete a category")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Category deleted",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = SuccessResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Success",
+                                            value = """
+                                                    {
+                                                      "message": "Category deleted",
+                                                      "type": "Success"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Unauthorized",
+                                            value = """
+                                                    {
+                                                      "code": 401,
+                                                      "message": "Unauthorized",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Category not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(
+                                    implementation = ErrorResponseDTO.class
+                            ),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Category not found",
+                                            value = """
+                                                    {
+                                                      "code": 404,
+                                                      "message": "Category not found",
+                                                      "type": "Error"
+                                                    }
+                                                    """
+                                    )
+                            }
+                    )
+            )
+    })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")

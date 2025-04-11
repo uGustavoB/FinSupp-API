@@ -13,13 +13,11 @@ public class ErrorResponseDTO {
     private String message;
     @Builder.Default
     private String type = "Error";
-    private String field;
     private List<Object> dataList;
 
-    public ErrorResponseDTO(int code, String message, String type, String field) {
+    public ErrorResponseDTO(int code, String message, String type) {
         this.code = code;
         this.message = message;
         this.type = type;
-        this.field = field;
     }
 }

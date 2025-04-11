@@ -31,22 +31,6 @@ public class ExceptionHandlerController {
     public ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         List<Object> dto = new ArrayList<>();
 
-//        adiciona os erros de validação na lista, depois retorna um ErrorResponseDTO, como dataList, a lista de erros
-//        exemplos:
-//        {
-//            "message": "Account already exists! Please, try again with a different description.",
-//                "type": "Error"
-//            "dataList": [
-//            "message": "Closing day must be between 1 and 31",
-//                "field": "ClosingDay"
-//        },
-//        {
-//            "message": "Agency number must be greater than or equal to 0",
-//                "field": "Balance"
-//        }
-// ]
-//    }
-//        OBS: Usar UnprocessableEntityExceptionDTO
         e.getFieldErrors().forEach(error -> {
             dto.add(new UnprocessableEntityExceptionDTO(error.getField(), error.getDefaultMessage()));
         });
@@ -54,7 +38,6 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(ErrorResponseDTO.builder()
                 .message("Validation error")
                 .code(422)
-                .type("Validation Error")
                 .dataList(dto)
                 .build(), HttpStatus.UNPROCESSABLE_ENTITY);
     }
@@ -84,9 +67,10 @@ public class ExceptionHandlerController {
                 HttpStatus.BAD_REQUEST);
     }
 
+//    Gustavo - corrigir depois para exibir no dataList
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).field("Email").build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),
                 HttpStatus.CONFLICT);
     }
 
@@ -110,9 +94,10 @@ public class ExceptionHandlerController {
     }
 
 //  Category Exceptions
+//    Gustavo - corrigir depois para exibir no dataList
     @ExceptionHandler(CategoryDescriptionAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleCategoryDescriptionAlreadyExistsException(CategoryDescriptionAlreadyExistsException e) {
-        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).field("Description").build(),
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),
                 HttpStatus.CONFLICT);
     }
 
@@ -205,8 +190,7 @@ public class ExceptionHandlerController {
         return ResponseEntity.internalServerError().body(new ErrorResponseDTO(
                 500,
                 "An unexpected error occurred",
-                "Error",
-                null
+                "Error"
         ));
     }
 }

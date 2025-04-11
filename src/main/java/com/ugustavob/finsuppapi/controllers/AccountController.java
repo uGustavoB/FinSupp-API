@@ -90,6 +90,7 @@ public class AccountController {
                                                     name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -114,6 +115,7 @@ public class AccountController {
                                                     name = "This occurs when no account is found.",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Account not found",
                                                               "type": "Error"
                                                             }
@@ -198,6 +200,7 @@ public class AccountController {
                                                     name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -222,6 +225,7 @@ public class AccountController {
                                                     name = "This occurs when no account is found.",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Account not found",
                                                               "type": "Error"
                                                             }
@@ -305,6 +309,7 @@ public class AccountController {
                                                     name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -329,6 +334,7 @@ public class AccountController {
                                                     name = "This occurs when no account is found.",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Account not found",
                                                               "type": "Error"
                                                             }
@@ -350,9 +356,11 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "This happens when the account description already exists for the user.",
+                                                    name = "This happens when the account description already exists " +
+                                                            "for the user.",
                                                     value = """
                                                             {
+                                                              "code": 409,
                                                               "message": "Account already exists! Please, try again with a different description.",
                                                               "type": "Error"
                                                             }
@@ -374,20 +382,24 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "This happens when the request is well-formed but contains semantic errors.",
+                                                    name = "This happens when the request is well-formed but contains" +
+                                                            " semantic errors.",
                                                     value = """
-                                                            [
-                                                              {
-                                                                "message": "Closing day must be between 1 and 31",
-                                                                "type": "Error",
-                                                                "field": "ClosingDay"
-                                                              },
-                                                              {
-                                                                "message": "Agency number must be greater than or equal to 0",
-                                                                "type": "Error",
-                                                                "field": "Balance"
-                                                              }
-                                                            ]
+                                                            {
+                                                              "code": 422,
+                                                              "message": "Validation error",
+                                                              "type": "Error",
+                                                              "dataList": [
+                                                                {
+                                                                  "description": "balance",
+                                                                  "field": "Agency number must be greater than or equal to 0"
+                                                                },
+                                                                {
+                                                                  "description": "closingDay",
+                                                                  "field": "Closing day must be between 1 and 31"
+                                                                }
+                                                              ]
+                                                            }
                                                             """,
                                                     summary = "Unprocessable Entity"
                                             ),
@@ -468,6 +480,7 @@ public class AccountController {
                                                     name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -492,6 +505,7 @@ public class AccountController {
                                                     name = "This occurs when no account is found.",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Account not found",
                                                               "type": "Error"
                                                             }
@@ -513,9 +527,11 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "This happens when the account description already exists for the user.",
+                                                    name = "This happens when the account description already exists " +
+                                                            "for the user.",
                                                     value = """
                                                             {
+                                                              "code": 409,
                                                               "message": "Account already exists! Please, try again with a different description.",
                                                               "type": "Error"
                                                             }
@@ -537,20 +553,24 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "This happens when the request is well-formed but contains semantic errors.",
+                                                    name = "This happens when the request is well-formed but contains" +
+                                                            " semantic errors.",
                                                     value = """
-                                                            [
-                                                              {
-                                                                "message": "Closing day must be between 1 and 31",
-                                                                "type": "Error",
-                                                                "field": "ClosingDay"
-                                                              },
-                                                              {
-                                                                "message": "Agency number must be greater than or equal to 0",
-                                                                "type": "Error",
-                                                                "field": "Balance"
-                                                              }
-                                                            ]
+                                                            {
+                                                              "code": 422,
+                                                              "message": "Validation error",
+                                                              "type": "Error",
+                                                              "dataList": [
+                                                                {
+                                                                  "description": "balance",
+                                                                  "field": "Agency number must be greater than or equal to 0"
+                                                                },
+                                                                {
+                                                                  "description": "closingDay",
+                                                                  "field": "Closing day must be between 1 and 31"
+                                                                }
+                                                              ]
+                                                            }
                                                             """,
                                                     summary = "Unprocessable Entity"
                                             ),
@@ -617,6 +637,7 @@ public class AccountController {
                                                     name = "This occurs when the user is not authenticated.",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -641,6 +662,7 @@ public class AccountController {
                                                     name = "This occurs when no account is found.",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Account not found",
                                                               "type": "Error"
                                                             }
@@ -662,9 +684,11 @@ public class AccountController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "This occurs when the account has transactions or subscriptions associated with it.",
+                                                    name = "This occurs when the account has transactions or " +
+                                                            "subscriptions associated with it.",
                                                     value = """
                                                             {
+                                                              "code": 409,
                                                               "message": "Account cannot be deleted because it has transactions or subscriptions associated with it.",
                                                               "type": "Error"
                                                             }

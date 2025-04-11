@@ -83,6 +83,7 @@ public class CardController {
                                                     name = "This occurs when the user is not authenticated",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -105,6 +106,7 @@ public class CardController {
                                                     name = "This occurs when the user is not authenticated",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Card not found",
                                                               "type": "Error"
                                                             }
@@ -183,6 +185,7 @@ public class CardController {
                                                     name = "This occurs when the user is not authenticated",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -205,6 +208,7 @@ public class CardController {
                                                     name = "This occurs when the cards are not found",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Cards not found",
                                                               "type": "Error"
                                                             }
@@ -283,6 +287,7 @@ public class CardController {
                                                     name = "This occurs when the user is not authenticated",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -305,6 +310,7 @@ public class CardController {
                                                     name = "This occurs when the card is not found",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Card not found",
                                                               "type": "Error"
                                                             }
@@ -383,6 +389,7 @@ public class CardController {
                                                     name = "This occurs when the user is not authenticated",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -405,6 +412,7 @@ public class CardController {
                                                     name = "This occurs when the card is not found",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Card not found",
                                                               "type": "Error"
                                                             }
@@ -415,6 +423,7 @@ public class CardController {
                                                     name = "This occurs when the account is not found",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Account not found",
                                                               "type": "Error"
                                                             }
@@ -477,6 +486,7 @@ public class CardController {
                                                     name = "This occurs when the user is not authenticated",
                                                     value = """
                                                             {
+                                                              "code": 401,
                                                               "message": "Unauthorized",
                                                               "type": "Error"
                                                             }
@@ -499,6 +509,7 @@ public class CardController {
                                                     name = "This occurs when the card is not found",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Card not found",
                                                               "type": "Error"
                                                             }
@@ -509,6 +520,7 @@ public class CardController {
                                                     name = "This occurs when the account is not found",
                                                     value = """
                                                             {
+                                                              "code": 404,
                                                               "message": "Account not found",
                                                               "type": "Error"
                                                             }
