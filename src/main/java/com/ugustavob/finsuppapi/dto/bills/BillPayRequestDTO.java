@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 public record BillPayRequestDTO(
-        @Schema(description = "", example = "1")
+        @Schema(description = "Account Id", example = "1")
         @NotNull Integer payWithAccount
         ) {
 }

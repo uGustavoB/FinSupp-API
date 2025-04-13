@@ -504,7 +504,7 @@ public class TransactionController {
         ));
     }
 
-    @Operation(summary = "Create transaction")
+    @Operation(summary = "Update transaction")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",

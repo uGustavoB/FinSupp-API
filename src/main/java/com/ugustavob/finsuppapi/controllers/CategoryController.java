@@ -65,12 +65,21 @@ public class CategoryController {
                                                         {
                                                           "id": 3,
                                                           "description": "Health"
+                                                        },
+                                                        {
+                                                          "id": 4,
+                                                          "description": "Entertainment"
+                                                        },
+                                                        {
+                                                          "id": 5,
+                                                          "description": "Education"
                                                         }
+                                                      ],
                                                       "pagination": {
                                                         "currentPage": 0,
                                                         "pageSize": 10,
                                                         "totalPages": 1,
-                                                        "totalElements": 3
+                                                        "totalElements": 10
                                                       }
                                                     }
                                                     """

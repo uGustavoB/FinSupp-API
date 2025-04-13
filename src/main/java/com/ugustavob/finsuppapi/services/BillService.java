@@ -215,10 +215,6 @@ public class BillService {
 
     @Transactional
     public BillEntity payBill(BillEntity bill) {
-        if (bill.getStatus() == BillStatus.PAID) {
-            throw new IllegalStateException("Bill is already paid");
-        }
-
         if (bill.getStatus() == BillStatus.CANCELED) {
             throw new IllegalStateException("Bill is canceled");
         }
