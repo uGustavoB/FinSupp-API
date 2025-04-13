@@ -108,7 +108,7 @@ public class TransactionService {
         Page<TransactionEntity> transactionsPage = transactionRepository.findAll(specification, pageable);
 
         if (transactionsPage.isEmpty()) {
-            throw new TransactionNotFoundException();
+            throw new TransactionNotFoundException("Transactions not found");
         }
 
         return transactionsPage.map(this::entityToResponseDto);
@@ -159,8 +159,9 @@ public class TransactionService {
     }
 
     @Transactional
-    public TransactionEntity updateTransaction(Integer id, CreateTransactionRequestDTO createTransactionRequestDTO) {
-        var transaction = transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
+    public TransactionEntity updateTransaction(Integer id, CreateTransactionRequestDTO createTransactionRequestDTO,
+                                               UUID userId) {
+        TransactionEntity transaction = transactionRepository.findById(id).orElseThrow(TransactionNotFoundException::new);
 
         TransactionEntityFinder transactionEntityFinder = getAndValidateTransactionEntities(createTransactionRequestDTO);
 
@@ -181,7 +182,17 @@ public class TransactionService {
             transaction.setInstallments(0);
         }
 
+        if (!transaction.getCard().getAccount().getUser().getId().equals(userId)) {
+            throw new CardNotFoundException();
+        }
+
         TransactionType type = createTransactionRequestDTO.type();
+        Double accountBalance = transactionEntityFinder.getCard().getAccount().getBalance();
+        Double transactionAmount = createTransactionRequestDTO.amount();
+
+        if (type == TransactionType.TRANSFER && accountBalance.compareTo(transactionAmount) < 0) {
+            throw new IllegalArgumentException("Insufficient funds");
+        }
 
         transactionEntityFinder = updateAccountBalance(transaction, transactionEntityFinder);
         billService.addTransactionToBill(transaction);
@@ -268,15 +279,11 @@ public class TransactionService {
                 transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() + transaction.getAmount());
                 break;
             case TRANSFER:
-                if (transactionEntityFinder.getCard().getType() == CardType.DEBIT) {
                     transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() + transaction.getAmount());
                     if (transaction.getRecipientAccount() != null) {
                         transactionEntityFinder.setRecipientAccount(transaction.getRecipientAccount());
                         transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() - transaction.getAmount());
                     }
-                } else {
-                    throw new IllegalArgumentException("You can't transfer with a credit card");
-                }
                 break;
         }
 

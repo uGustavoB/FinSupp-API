@@ -8,6 +8,12 @@ import com.ugustavob.finsuppapi.entities.subscription.SubscriptionInterval;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.SubscriptionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +35,40 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final BaseService baseService;
 
+    @Operation(summary = "Get subscription by ID")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Subscription retrieved successfully",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = SuccessResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Success",
+                                                    value = """
+                                                            {
+                                                                "message": "Subscription retrieved",
+                                                                "data": {
+                                                                    "id": 1,
+                                                                    "description": "Subscription description",
+                                                                    "interval": "MONTHLY",
+                                                                    "status": "ACTIVE",
+                                                                    "accountId": 1,
+                                                                    "cardId": 1
+                                                                }
+                                                            }
+                                                            """,
+                                                    summary = "Successful response"
+                                            )
+                                    }
+                            )
+                    }
+            )
+    })
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")

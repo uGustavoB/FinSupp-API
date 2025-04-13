@@ -24,7 +24,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         ErrorResponseDTO error = ErrorResponseDTO.builder()
                 .message("Unauthorized")
-                .build();
+                .code(401).build();
 
         String jsonResponse = objectMapper.writeValueAsString(error);
 
