@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.controllers;
 
+import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.subscription.CreateSubscriptionRequestDTO;
 import com.ugustavob.finsuppapi.dto.subscription.SubscriptionFilterDTO;
@@ -51,18 +52,69 @@ public class SubscriptionController {
                                                     name = "Success",
                                                     value = """
                                                             {
-                                                                "message": "Subscription retrieved",
-                                                                "data": {
-                                                                    "id": 1,
-                                                                    "description": "Subscription description",
-                                                                    "interval": "MONTHLY",
-                                                                    "status": "ACTIVE",
-                                                                    "accountId": 1,
-                                                                    "cardId": 1
-                                                                }
+                                                              "message": "Subscription retrieved",
+                                                              "type": "Success",
+                                                              "data": {
+                                                                "id": 1,
+                                                                "description": "Spotify",
+                                                                "price": 12,
+                                                                "interval": "MONTHLY",
+                                                                "status": "ACTIVE",
+                                                                "cardId": 1
+                                                              }
                                                             }
                                                             """,
-                                                    summary = "Successful response"
+                                                    summary = "Subscription retrieved"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unauthorized",
+                                                    value = """
+                                                            {
+                                                              "message": "Unauthorized",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "Unauthorized"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Subscription not found",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "This occurs when the subscription ID does not exist",
+                                                    value = """
+                                                            {
+                                                              "code": 404,
+                                                              "message": "Subscription not found",
+                                                              "type": "Error",
+                                                              "dataList": null
+                                                            }
+                                                            """,
+                                                    summary = "Subscription not found"
                                             )
                                     }
                             )
@@ -86,6 +138,93 @@ public class SubscriptionController {
         ));
     }
 
+    @Operation(summary = "Get all subscriptions")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Subscriptions retrieved successfully",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = SuccessResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Success",
+                                                    value = """
+                                                            {
+                                                              "message": "Subscriptions retrieved",
+                                                              "type": "Success",
+                                                              "data": [
+                                                                {
+                                                                  "id": 1,
+                                                                  "description": "Spotify",
+                                                                  "price": 12,
+                                                                  "interval": "MONTHLY",
+                                                                  "status": "ACTIVE",
+                                                                  "cardId": 1
+                                                                }
+                                                              ]
+                                                            }
+                                                            """,
+                                                    summary = "Subscriptions retrieved"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unauthorized",
+                                                    value = """
+                                                            {
+                                                              "message": "Unauthorized",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "Unauthorized"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No subscriptions found",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "This occurs when the user has no subscriptions",
+                                                    value = """
+                                                            {
+                                                              "code": 404,
+                                                              "message": "No subscriptions found",
+                                                              "type": "Error",
+                                                              "dataList": null
+                                                            }
+                                                            """,
+                                                    summary = "No subscriptions found"
+                                            )
+                                    }
+                            )
+                    }
+            )
+    })
     @GetMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
@@ -118,6 +257,126 @@ public class SubscriptionController {
         ));
     }
 
+    @Operation(summary = "Create a subscription")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Subscription created successfully",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = SuccessResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Success",
+                                                    value = """
+                                                            {
+                                                              "message": "Subscription created",
+                                                              "type": "Success",
+                                                              "data": {
+                                                                "id": 1,
+                                                                "description": "Spotify",
+                                                                "price": 12,
+                                                                "interval": "MONTHLY",
+                                                                "status": "ACTIVE",
+                                                                "cardId": 1
+                                                              }
+                                                            }
+                                                            """,
+                                                    summary = "Subscription created"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unauthorized",
+                                                    value = """
+                                                            {
+                                                              "message": "Unauthorized",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "Unauthorized"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Card not found",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "This occurs when the card ID does not exist",
+                                                    value = """
+                                                            {
+                                                              "code": 404,
+                                                              "message": "Card not found",
+                                                              "type": "Error",
+                                                              "dataList": null
+                                                            }
+                                                            """,
+                                                    summary = "Card not found"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Invalid request body",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "This occurs when the request body is invalid",
+                                                    value = """
+                                                            {
+                                                              "code": 422,
+                                                              "message": "Validation error",
+                                                              "type": "Error",
+                                                              "dataList": [
+                                                                {
+                                                                  "description": "cardId",
+                                                                  "field": "Account ID cannot be null"
+                                                                },
+                                                                {
+                                                                  "description": "description",
+                                                                  "field": "Description cannot be null"
+                                                                }
+                                                              ]
+                                                            }
+                                                            """,
+                                                    summary = "Invalid request body"
+                                            )
+                                    }
+                            )
+                    }
+            )
+    })
     @PostMapping("/")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
@@ -141,6 +400,138 @@ public class SubscriptionController {
         ));
     }
 
+    @Operation(summary = "Update a subscription")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Subscription updated successfully",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = SuccessResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Success",
+                                                    value = """
+                                                            {
+                                                              "message": "Subscription updated",
+                                                              "type": "Success",
+                                                              "data": {
+                                                                "id": 1,
+                                                                "description": "Spotify",
+                                                                "price": 12,
+                                                                "interval": "MONTHLY",
+                                                                "status": "ACTIVE",
+                                                                "cardId": 1
+                                                              }
+                                                            }
+                                                            """,
+                                                    summary = "Subscription updated"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unauthorized",
+                                                    value = """
+                                                            {
+                                                              "message": "Unauthorized",
+                                                              "type": "Error"
+                                                            }
+                                                            """,
+                                                    summary = "Unauthorized"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Subscription not found or Card not found",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "This occurs when the card ID does not exist",
+                                                    value = """
+                                                            {
+                                                              "code": 404,
+                                                              "message": "Card not found",
+                                                              "type": "Error",
+                                                              "dataList": null
+                                                            }
+                                                            """,
+                                                    summary = "Card not found"
+                                            ),
+                                            @ExampleObject(
+                                                    name = "This occurs when the subscription ID does not exist",
+                                                    value = """
+                                                            {
+                                                              "code": 404,
+                                                              "message": "Subscription not found",
+                                                              "type": "Error",
+                                                              "dataList": null
+                                                            }
+                                                            """,
+                                                    summary = "Subscription not found"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Invalid request body",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "This occurs when the request body is invalid",
+                                                    value = """
+                                                            {
+                                                              "code": 422,
+                                                              "message": "Validation error",
+                                                              "type": "Error",
+                                                              "dataList": [
+                                                                {
+                                                                  "description": "cardId",
+                                                                  "field": "Account ID cannot be null"
+                                                                },
+                                                                {
+                                                                  "description": "description",
+                                                                  "field": "Description cannot be null"
+                                                                }
+                                                              ]
+                                                            }
+                                                            """,
+                                                    summary = "Invalid request body"
+                                            )
+                                    }
+                            )
+                    }
+            )
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
