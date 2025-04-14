@@ -1,0 +1,1 @@
+web: java -jar target/FinSupp-API-0.0.1-SNAPSHOT.jar
