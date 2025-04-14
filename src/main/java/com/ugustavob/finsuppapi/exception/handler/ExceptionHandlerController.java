@@ -32,7 +32,7 @@ public class ExceptionHandlerController {
         List<Object> dto = new ArrayList<>();
 
         e.getFieldErrors().forEach(error -> {
-            dto.add(new UnprocessableEntityExceptionDTO(error.getField(), error.getDefaultMessage()));
+            dto.add(new UnprocessableEntityExceptionDTO(error.getDefaultMessage(), error.getField()));
         });
 
         return new ResponseEntity<>(ErrorResponseDTO.builder()
