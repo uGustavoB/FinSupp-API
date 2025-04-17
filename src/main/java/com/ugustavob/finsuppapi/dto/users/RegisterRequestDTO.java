@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 public record RegisterRequestDTO(
         @NotBlank(message = "Name is required")
         @Schema(description = "Name of the user", example = "Jesse Pinkman", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Length(min = 3, max = 50, message = "Name must have between 3 and 50 characters")
         String name,
         @NotBlank(message = "Email is required")
         @Email(message = "Invalid email")

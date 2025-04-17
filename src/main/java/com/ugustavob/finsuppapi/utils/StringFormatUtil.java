@@ -6,7 +6,7 @@ public class StringFormatUtil {
             return str;
         }
 
-        str = str.replaceAll("[^a-zA-Z0-9\\s]", "");
+        str = str.replaceAll("[^\\p{L}\\p{N}\\s\\-\'’]", "");
 
         str = str.trim().replaceAll("\\s+", " ");
 
@@ -14,7 +14,7 @@ public class StringFormatUtil {
         boolean capitalizeNext = true;
 
         for (char c : str.toCharArray()) {
-            if (c == ' ') {
+            if (Character.isWhitespace(c) || c == '-' || c == '\'' || c == '’') {
                 formattedString.append(c);
                 capitalizeNext = true;
             } else if (capitalizeNext) {

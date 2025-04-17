@@ -271,6 +271,10 @@ public class TransactionService {
             TransactionEntityFinder transactionEntityFinder
     ) {
 
+        if (transaction.getCard().getType() == CardType.CREDIT) {
+            return transactionEntityFinder;
+        }
+
         switch (transaction.getTransactionType()) {
             case DEPOSIT:
                 transactionEntityFinder.getCard().getAccount().setBalance(transactionEntityFinder.getCard().getAccount().getBalance() - transaction.getAmount());

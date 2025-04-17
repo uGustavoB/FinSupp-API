@@ -5,10 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.hibernate.validator.constraints.Length;
 
 public record CreateCardRequestDTO(
         @NotNull(message = "Card description cannot be null")
+        @Length(min = 1, max = 30, message = "Card description must be between 1 and 30 characters")
         @Schema(
                 description = "Description of the card",
                 example = "My Card"
@@ -22,7 +24,8 @@ public record CreateCardRequestDTO(
         )
         String lastNumbers,
         @NotNull(message = "Card limit cannot be null")
-        @Min(value = 0, message = "Card limit must be greater than or equal to 0")
+        @Min(value = 1, message = "Card limit must be at least 1")
+        @Max(value = 999999999, message = "Card limit must be less than 10 digits")
         @Schema(
                 description = "Card limit",
                 example = "1000"
