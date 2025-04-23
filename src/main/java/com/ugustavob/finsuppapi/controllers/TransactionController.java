@@ -478,6 +478,45 @@ public class TransactionController {
                                     }
                             )
                     }
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Validation Error",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unprocessable Entity",
+                                                    value = """
+                                                            {
+                                                              "code": 422,
+                                                              "message": "Validation error",
+                                                              "type": "Error",
+                                                              "dataList": [
+                                                                {
+                                                                  "description": "Transaction amount must be greater than zero",
+                                                                  "field": "amount"
+                                                                },
+                                                                {
+                                                                  "description": "Description must be less than 30 characters",
+                                                                  "field": "description"
+                                                                },
+                                                                {
+                                                                  "description": "Transaction amount must be greater than zero",
+                                                                  "field": "amount"
+                                                                }
+                                                              ]
+                                                            }
+                                                            }
+                                                            """
+                                            )
+                                    }
+                            )
+                    }
             )
     })
     @PostMapping("/")
@@ -676,6 +715,45 @@ public class TransactionController {
                                                             }
                                                             """,
                                                     summary = "Card not found"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Validation Error",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = ErrorResponseDTO.class
+                                    ),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "Unprocessable Entity",
+                                                    value = """
+                                                            {
+                                                              "code": 422,
+                                                              "message": "Validation error",
+                                                              "type": "Error",
+                                                              "dataList": [
+                                                                {
+                                                                  "description": "Transaction amount must be greater than zero",
+                                                                  "field": "amount"
+                                                                },
+                                                                {
+                                                                  "description": "Description must be less than 30 characters",
+                                                                  "field": "description"
+                                                                },
+                                                                {
+                                                                  "description": "Transaction amount must be greater than zero",
+                                                                  "field": "amount"
+                                                                }
+                                                              ]
+                                                            }
+                                                            }
+                                                            """
                                             )
                                     }
                             )

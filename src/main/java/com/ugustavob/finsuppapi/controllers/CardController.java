@@ -320,6 +320,39 @@ public class CardController {
                                     }
                             )
                     }
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Validation error",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponseDTO.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "This occurs when the request body is invalid",
+                                                    value = """
+                                                            {
+                                                              "code": 422,
+                                                              "message": "Validation error",
+                                                              "type": "Error",
+                                                              "dataList": [
+                                                                {
+                                                                  "description": "Card limit must be at least 1",
+                                                                  "field": "limit"
+                                                                },
+                                                                {
+                                                                      "description": "Card number must be 4 digits",
+                                                                      "field": "lastNumbers"
+                                                                    }
+                                                              ]
+                                                            }
+                                                            """,
+                                                    summary = "Validation error"
+                                            )
+                                    }
+                            )
+                    }
             )
     })
     @PostMapping("/")
@@ -429,6 +462,39 @@ public class CardController {
                                                             }
                                                             """,
                                                     summary = "Account not found"
+                                            )
+                                    }
+                            )
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Validation error",
+                    content = {
+                            @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponseDTO.class),
+                                    examples = {
+                                            @ExampleObject(
+                                                    name = "This occurs when the request body is invalid",
+                                                    value = """
+                                                            {
+                                                              "code": 422,
+                                                              "message": "Validation error",
+                                                              "type": "Error",
+                                                              "dataList": [
+                                                                {
+                                                                  "description": "Card limit must be at least 1",
+                                                                  "field": "limit"
+                                                                },
+                                                                {
+                                                                      "description": "Card number must be 4 digits",
+                                                                      "field": "lastNumbers"
+                                                                    }
+                                                              ]
+                                                            }
+                                                            """,
+                                                    summary = "Validation error"
                                             )
                                     }
                             )

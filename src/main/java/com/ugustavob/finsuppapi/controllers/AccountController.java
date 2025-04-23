@@ -391,12 +391,12 @@ public class AccountController {
                                                               "type": "Error",
                                                               "dataList": [
                                                                 {
-                                                                  "description": "balance",
-                                                                  "field": "Agency number must be greater than or equal to 0"
+                                                                  "description": "Agency number must be greater than or equal to 0",
+                                                                  "field": "balance"
                                                                 },
                                                                 {
-                                                                  "description": "closingDay",
-                                                                  "field": "Closing day must be between 1 and 31"
+                                                                  "description": "Closing day must be between 1 and 31",
+                                                                  "field": "closingDay"
                                                                 }
                                                               ]
                                                             }
@@ -562,12 +562,12 @@ public class AccountController {
                                                               "type": "Error",
                                                               "dataList": [
                                                                 {
-                                                                  "description": "balance",
-                                                                  "field": "Agency number must be greater than or equal to 0"
+                                                                  "description": "Agency number must be greater than or equal to 0"
+                                                                  "field": "balance",
                                                                 },
                                                                 {
-                                                                  "description": "closingDay",
-                                                                  "field": "Closing day must be between 1 and 31"
+                                                                  "description": "Closing day must be between 1 and 31"
+                                                                  "field": "closingDay",
                                                                 }
                                                               ]
                                                             }
