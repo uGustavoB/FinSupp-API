@@ -511,7 +511,6 @@ public class TransactionController {
                                                                 }
                                                               ]
                                                             }
-                                                            }
                                                             """
                                             )
                                     }
@@ -751,7 +750,6 @@ public class TransactionController {
                                                                   "field": "amount"
                                                                 }
                                                               ]
-                                                            }
                                                             }
                                                             """
                                             )

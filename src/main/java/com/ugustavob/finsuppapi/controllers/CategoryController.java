@@ -310,8 +310,8 @@ public class CategoryController {
                                                       "type": "Error",
                                                       "dataList": [
                                                         {
-                                                          "description": "Category name must be between 1 and 20 characters"
-                                                          "field": "description",
+                                                          "description": "Category name must be between 1 and 20 characters",
+                                                          "field": "description"
                                                         }
                                                       ]
                                                     }
@@ -433,8 +433,8 @@ public class CategoryController {
                                                       "type": "Error",
                                                       "dataList": [
                                                         {
-                                                          "description": "Category name must be between 1 and 20 characters"
-                                                          "field": "description",
+                                                          "description": "Category name must be between 1 and 20 characters",
+                                                          "field": "description"
                                                         }
                                                       ]
                                                     }

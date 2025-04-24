@@ -360,12 +360,12 @@ public class SubscriptionController {
                                                               "type": "Error",
                                                               "dataList": [
                                                                 {
-                                                                  "description": "Account ID cannot be null"
-                                                                  "field": "cardId",
+                                                                  "description": "Account ID cannot be null",
+                                                                  "field": "cardId"
                                                                 },
                                                                 {
-                                                                  "description": "Description cannot be null"
-                                                                  "field": "description",
+                                                                  "description": "Description cannot be null",
+                                                                  "field": "description"
                                                                 }
                                                               ]
                                                             }
@@ -515,12 +515,12 @@ public class SubscriptionController {
                                                               "type": "Error",
                                                               "dataList": [
                                                                 {
-                                                                  "description": "Account ID cannot be null"
-                                                                  "field": "cardId",
+                                                                  "description": "Account ID cannot be null",
+                                                                  "field": "cardId"
                                                                 },
                                                                 {
-                                                                  "description": "Description cannot be null"
-                                                                  "field": "description",
+                                                                  "description": "Description cannot be null",
+                                                                  "field": "description"
                                                                 }
                                                               ]
                                                             }
