@@ -154,6 +154,12 @@ public class ExceptionHandlerController {
     }
 
 //  Others Exceptions
+    @ExceptionHandler(BankNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleBankNotFoundException(BankNotFoundException e) {
+        return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(404).build(),
+                HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponseDTO> handleBusinessException(BusinessException e) {
         return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(422).build(),
