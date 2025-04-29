@@ -2,6 +2,7 @@ package com.ugustavob.finsuppapi.controllers;
 
 import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
+import com.ugustavob.finsuppapi.dto.categories.CategoryFilterDTO;
 import com.ugustavob.finsuppapi.dto.categories.CategoryResponseDTO;
 import com.ugustavob.finsuppapi.dto.categories.CreateCategoryRequestDTO;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -69,18 +71,8 @@ public class CategoryController {
                                                         {
                                                           "id": 4,
                                                           "description": "Entertainment"
-                                                        },
-                                                        {
-                                                          "id": 5,
-                                                          "description": "Education"
                                                         }
-                                                      ],
-                                                      "pagination": {
-                                                        "currentPage": 0,
-                                                        "pageSize": 10,
-                                                        "totalPages": 1,
-                                                        "totalElements": 10
-                                                      }
+                                                      ]
                                                     }
                                                     """
                                     )
@@ -136,110 +128,19 @@ public class CategoryController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @SecurityRequirement(name = "bearer")
     public ResponseEntity<?> getCategories(
-            HttpServletRequest request,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size
-    ) {
-        baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
-
-        Page<CategoryResponseDTO> categoriesPage = categoryService.getAllCategories(page, size);
-
-        if (categoriesPage == null || categoriesPage.isEmpty()) {
-            throw new CategoryNotFoundException("Categories not found");
-        }
-
-        return ResponseEntity.ok(new SuccessResponseDTO<>(
-                "Categories found",
-                categoriesPage
-        ));
-    }
-
-    @Operation(summary = "Get category by ID")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Category found",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(
-                                    implementation = SuccessResponseDTO.class
-                            ),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Success",
-                                            value = """
-                                                    {
-                                                      "message": "Category found",
-                                                      "type": "Success",
-                                                      "data": {
-                                                        "id": 1,
-                                                        "description": "Food"
-                                                      }
-                                                    }
-                                                    """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Unauthorized",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(
-                                    implementation = ErrorResponseDTO.class
-                            ),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Unauthorized",
-                                            value = """
-                                                    {
-                                                      "code": 401,
-                                                      "message": "Unauthorized",
-                                                      "type": "Error"
-                                                    }
-                                                    """
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Category not found",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(
-                                    implementation = ErrorResponseDTO.class
-                            ),
-                            examples = {
-                                    @ExampleObject(
-                                            name = "Category not found",
-                                            value = """
-                                                    {
-                                                      "code": 404,
-                                                      "message": "Category not found",
-                                                      "type": "Error"
-                                                    }
-                                                    """
-                                    )
-                            }
-                    )
-            )
-    })
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    @SecurityRequirement(name = "bearer")
-    public ResponseEntity<SuccessResponseDTO<CategoryResponseDTO>> getCategoryById(
-            @PathVariable Integer id,
+            @RequestParam(required = false) Integer id,
+            @RequestParam(required = false) String description,
             HttpServletRequest request
     ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        CategoryEntity categoryEntity = categoryService.getCategoryById(id);
+        CategoryFilterDTO categoryFilterDTO = new CategoryFilterDTO(id, description);
+
+        List<CategoryEntity> categories = categoryService.getAll(categoryFilterDTO);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
-                "Category found",
-                new CategoryResponseDTO(categoryEntity.getId(), categoryEntity.getDescription())
+                "Categories found",
+                categories
         ));
     }
 

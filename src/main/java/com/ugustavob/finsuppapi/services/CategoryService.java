@@ -1,21 +1,21 @@
 package com.ugustavob.finsuppapi.services;
 
-import com.ugustavob.finsuppapi.dto.categories.CategoryResponseDTO;
+import com.ugustavob.finsuppapi.dto.categories.CategoryFilterDTO;
 import com.ugustavob.finsuppapi.dto.categories.CreateCategoryRequestDTO;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
 import com.ugustavob.finsuppapi.exception.BusinessException;
 import com.ugustavob.finsuppapi.exception.CategoryDescriptionAlreadyExistsException;
 import com.ugustavob.finsuppapi.exception.CategoryNotFoundException;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
+import com.ugustavob.finsuppapi.specifications.CategorySpecification;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,14 +28,10 @@ public class CategoryService {
         return categoryRepository.findById(id).orElseThrow(CategoryNotFoundException::new);
     }
 
-    public Page<CategoryResponseDTO> getAllCategories(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<CategoryEntity> categoriesPage = categoryRepository.findAll(pageable);
+    public List<CategoryEntity> getAll(CategoryFilterDTO filterDTO) {
+        Specification<CategoryEntity> specification = CategorySpecification.filter(filterDTO);
 
-        return categoriesPage.map(category -> new CategoryResponseDTO(
-                category.getId(),
-                category.getDescription()
-        ));
+        return categoryRepository.findAll(specification);
     }
 
     public CategoryEntity createCategory(@Valid CreateCategoryRequestDTO createCategoryRequestDTO) {

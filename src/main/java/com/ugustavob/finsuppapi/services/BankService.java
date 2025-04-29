@@ -2,7 +2,6 @@ package com.ugustavob.finsuppapi.services;
 
 import com.ugustavob.finsuppapi.dto.banks.BankFilterDTO;
 import com.ugustavob.finsuppapi.entities.bank.BankEntity;
-import com.ugustavob.finsuppapi.exception.BankNotFoundException;
 import com.ugustavob.finsuppapi.repositories.BankRepository;
 import com.ugustavob.finsuppapi.specifications.BankSpecification;
 import com.ugustavob.finsuppapi.utils.StringFormatUtil;
