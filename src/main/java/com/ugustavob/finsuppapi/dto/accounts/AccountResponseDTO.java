@@ -7,7 +7,7 @@ import java.util.UUID;
 public record AccountResponseDTO(
         Integer id,
         String description,
-        String bank,
+        Integer bank,
         AccountType accountType,
         int closingDay,
         int paymentDueDay,

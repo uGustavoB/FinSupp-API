@@ -16,6 +16,10 @@ import java.util.List;
 public class BankService {
     private final BankRepository bankRepository;
 
+    public BankEntity getBankById(int id) {
+        return bankRepository.findById(id).orElseThrow(() -> new RuntimeException("Bank not found"));
+    }
+
     public List<BankEntity> findAll(BankFilterDTO filter) {
         Specification<BankEntity> specification = BankSpecification.filter(filter);
 

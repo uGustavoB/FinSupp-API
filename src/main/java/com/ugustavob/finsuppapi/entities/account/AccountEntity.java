@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.entities.account;
 
+import com.ugustavob.finsuppapi.entities.bank.BankEntity;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,8 +26,10 @@ public class AccountEntity {
 
     private double balance;
 
-    @Column(nullable = false)
-    private String bank;
+    @ManyToOne()
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "bank", nullable = false)
+    private BankEntity bank;
 
     @Enumerated(EnumType.STRING)
     private AccountType accountType;

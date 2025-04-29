@@ -13,10 +13,8 @@ public record CreateAccountRequestDTO(
         @NotNull(message = "Account type is required")
         @Schema(description = "Type of the account", example = "CHECKING")
         AccountType accountType,
-        @NotBlank(message = "Bank is required")
-        @Schema(description = "Bank of the account", example = "Banco do Brasil")
-        @Length(min = 1, max = 30, message = "Bank name must be between 1 and 30 characters")
-        String bank,
+        @Positive(message = "Bank ID must be positive")
+        Integer bank,
         @Positive(message = "Balance must be positive")
         @Min(value = 0, message = "Balance must be positive")
         @Max(value = 999999999, message = "Balance must be less than 1 billion")

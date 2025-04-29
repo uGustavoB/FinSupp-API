@@ -1,17 +1,13 @@
 package com.ugustavob.finsuppapi.entities.bank;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Tag(name = "banks")
+@Table(name = "banks")
 @Getter
 @Setter
 @AllArgsConstructor

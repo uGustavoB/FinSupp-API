@@ -4,6 +4,7 @@ import com.ugustavob.finsuppapi.dto.accounts.AccountFilterDTO;
 import com.ugustavob.finsuppapi.dto.accounts.AccountResponseDTO;
 import com.ugustavob.finsuppapi.dto.accounts.CreateAccountRequestDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
+import com.ugustavob.finsuppapi.entities.bank.BankEntity;
 import com.ugustavob.finsuppapi.entities.user.UserEntity;
 import com.ugustavob.finsuppapi.exception.*;
 import com.ugustavob.finsuppapi.repositories.AccountRepository;
@@ -27,6 +28,7 @@ public class AccountService {
     private final UserRepository userRepository;
     private final SubscriptionService subscriptionService;
     private final TransactionService transactionService;
+    private final BankService bankService;
 
     public AccountEntity createAccount(CreateAccountRequestDTO createAccountRequestDTO, UserEntity userEntity) {
         boolean account =
@@ -37,9 +39,11 @@ public class AccountService {
             throw new AccountAlreadyExistsException();
         }
 
+        BankEntity bankEntity = bankService.getBankById(createAccountRequestDTO.bank());
+
         AccountEntity newAccount = new AccountEntity();
         newAccount.setDescription(StringFormatUtil.toTitleCase(createAccountRequestDTO.description()));
-        newAccount.setBank(StringFormatUtil.toTitleCase(createAccountRequestDTO.bank()));
+        newAccount.setBank(bankEntity);
         newAccount.setUser(userEntity);
         if (createAccountRequestDTO.balance() != null) {
             newAccount.setBalance(createAccountRequestDTO.balance());
@@ -75,8 +79,10 @@ public class AccountService {
             }
         }
 
+        BankEntity bankEntity = bankService.getBankById(createAccountRequestDTO.bank());
+
         account.setDescription(StringFormatUtil.toTitleCase(createAccountRequestDTO.description()));
-        account.setBank(StringFormatUtil.toTitleCase(createAccountRequestDTO.bank()));
+        account.setBank(bankEntity);
         account.setAccountType(createAccountRequestDTO.accountType());
 
         if (createAccountRequestDTO.balance() != null) {
@@ -129,7 +135,7 @@ public class AccountService {
         return new AccountResponseDTO(
                 accountEntity.getId(),
                 accountEntity.getDescription(),
-                accountEntity.getBank(),
+                accountEntity.getBank().getId(),
                 accountEntity.getAccountType(),
                 accountEntity.getClosingDay(),
                 accountEntity.getPaymentDueDay(),
