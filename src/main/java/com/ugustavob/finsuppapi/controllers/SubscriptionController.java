@@ -4,9 +4,11 @@ import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.subscription.CreateSubscriptionRequestDTO;
 import com.ugustavob.finsuppapi.dto.subscription.SubscriptionFilterDTO;
+import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionInterval;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
+import com.ugustavob.finsuppapi.services.AccountService;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.SubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +37,7 @@ import java.util.UUID;
 public class SubscriptionController {
     private final SubscriptionService subscriptionService;
     private final BaseService baseService;
+    private final AccountService accountService;
 
     @Operation(summary = "Get subscription by ID")
     @ApiResponses(value = {
@@ -385,7 +388,14 @@ public class SubscriptionController {
     ) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        SubscriptionEntity subscription = subscriptionService.createSubscription(createSubscriptionRequestDTO, userId);
+        AccountEntity account =
+                accountService.getAccountByIdAndCompareWithUserId(createSubscriptionRequestDTO.accountId(), userId);
+
+        SubscriptionEntity subscription = subscriptionService.createSubscription(
+                createSubscriptionRequestDTO,
+                account,
+                userId
+        );
 
         URI location = URI.create(
                 ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -542,7 +552,15 @@ public class SubscriptionController {
     ) {
         UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        SubscriptionEntity subscription = subscriptionService.updateSubscription(id, createSubscriptionRequestDTO, userId);
+        AccountEntity account =
+                accountService.getAccountByIdAndCompareWithUserId(createSubscriptionRequestDTO.accountId(), userId);
+
+        SubscriptionEntity subscription = subscriptionService.updateSubscription(
+                id,
+                createSubscriptionRequestDTO,
+                account,
+                userId
+        );
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Subscription updated",

@@ -23,9 +23,13 @@ public record CreateSubscriptionRequestDTO(
         @Schema(description = "Status of the subscription", example = "ACTIVE")
         @NotNull(message = "Status cannot be null")
         SubscriptionStatus status,
-        @Schema(description = "Card ID associated with the subscription", example = "1")
-        @Positive(message = "Card ID must be positive")
+        @Schema(description = "Account ID associated with the subscription", example = "1")
+        @Positive(message = "Account ID must be positive")
         @NotNull(message = "Account ID cannot be null")
-        Integer cardId
+        Integer accountId
+//        @Schema(description = "Card ID associated with the subscription", example = "1")
+//        @Positive(message = "Card ID must be positive")
+//        @NotNull(message = "Account ID cannot be null")
+//        Integer cardId
 ) {
 }

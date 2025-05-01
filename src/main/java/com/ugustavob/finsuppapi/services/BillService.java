@@ -40,7 +40,8 @@ public class BillService {
                 bill.getId(),
                 bill.getStatus(),
                 bill.getTotalAmount(),
-                bill.getCard().getAccount().getId(),
+//                bill.getCard() != null ? bill.getCard().getId() : null,
+                bill.getAccount() != null ? bill.getAccount().getId() : null,
                 bill.getStartDate(),
                 bill.getEndDate(),
                 bill.getDueDate()
@@ -60,7 +61,7 @@ public class BillService {
         );
     }
 
-    public BillEntity findOrCreateBill(AccountEntity account, CardEntity card, LocalDate transactionDate) {
+    public BillEntity findOrCreateBill(AccountEntity account, LocalDate transactionDate) {
         int closingDay = account.getClosingDay();
         LocalDate startDate = transactionDate.withDayOfMonth(closingDay).plusDays(1);
         LocalDate endDate = startDate.plusMonths(1).withDayOfMonth(closingDay);
@@ -70,7 +71,8 @@ public class BillService {
 
         if (bill == null) {
             bill = new BillEntity();
-            bill.setCard(card);
+//            bill.setCard(card);
+            bill.setAccount(account);
             bill.setStartDate(startDate);
             bill.setEndDate(endDate);
             bill.setDueDate(dueDate);
@@ -85,8 +87,8 @@ public class BillService {
 
     @Transactional
     public void addTransactionToBill(TransactionEntity transaction) {
-        if (transaction.getCard().getType() == CardType.CREDIT) {
-            AccountEntity account = transaction.getCard().getAccount();
+        if (transaction.isAddToBill()) {
+            AccountEntity account = transaction.getAccount();
             LocalDate dueDate = transaction.getTransactionDate();
 
             int installments = transaction.getInstallments();
@@ -95,7 +97,7 @@ public class BillService {
             for (int i = 0; i < installments; i++) {
                 LocalDate installmentDate = dueDate.plusMonths(i);
 
-                BillEntity bill = findOrCreateBill(account, transaction.getCard(), installmentDate);
+                BillEntity bill = findOrCreateBill(account, installmentDate);
 
                 if (bill.getStatus() != BillStatus.OPEN) {
                     throw new IllegalStateException("Bill is not open");
@@ -147,7 +149,6 @@ public class BillService {
         for (int installmentNumber = 1; installmentNumber <= totalInstallments; installmentNumber++) {
             BillEntity bill = findOrCreateBill(
                     subscription.getCard().getAccount(),
-                    subscription.getCard(),
                     startDate
             );
 
@@ -249,7 +250,7 @@ public class BillService {
     public Page<BillItemResponseDTO> findBillItemsByBill(BillEntity bill, UUID userId, int page, int size) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
 
-        if (!bill.getCard().getAccount().getUser().getId().equals(userId)) {
+        if (!bill.getAccount().getUser().getId().equals(userId)) {
             throw new BillNotFoundException("Bill not found.");
         }
 

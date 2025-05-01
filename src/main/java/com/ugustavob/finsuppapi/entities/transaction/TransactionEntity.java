@@ -34,6 +34,9 @@ public class TransactionEntity {
 
     private int installments;
 
+    @Column(name = "add_to_bill")
+    private boolean isAddToBill = false;
+
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
 
@@ -47,7 +50,12 @@ public class TransactionEntity {
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "card_id", nullable = false)
+    @JoinColumn(name = "account_id")
+    private AccountEntity account;
+
+    @ManyToOne()
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "card_id")
     private CardEntity card;
 
     @ManyToOne()

@@ -11,13 +11,20 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class TransactionEntityFinder {
-    private final CardEntity card;
+    private AccountEntity account;
     private AccountEntity recipientAccount;
+    private boolean addToBill;
     private final CategoryEntity category;
 
-    public TransactionEntityFinder(CardEntity card, AccountEntity recipientAccount) {
-        this.card = card;
+    public TransactionEntityFinder(AccountEntity account , AccountEntity recipientAccount) {
+        this.account = account;
         this.recipientAccount = recipientAccount;
         this.category = null;
+    }
+
+    public TransactionEntityFinder(AccountEntity account, AccountEntity recipientAccount, CategoryEntity category) {
+        this.account = account;
+        this.recipientAccount = recipientAccount;
+        this.category = category;
     }
 }

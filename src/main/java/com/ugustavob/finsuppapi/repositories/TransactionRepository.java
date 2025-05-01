@@ -40,6 +40,6 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
     @Query("SELECT COUNT(t) > 0 FROM TransactionEntity t WHERE t.category.id = :categoryId")
     boolean existsByCategoryId(@Param("categoryId") Integer categoryId);
 
-    @Query("SELECT COUNT(t) > 0 FROM TransactionEntity t WHERE t.card.account.id = :accountId")
+    @Query("SELECT COUNT(t) > 0 FROM TransactionEntity t WHERE t.account.id = :accountId")
     boolean existsByAccountId(@Param("accountId") Integer accountId);
 }

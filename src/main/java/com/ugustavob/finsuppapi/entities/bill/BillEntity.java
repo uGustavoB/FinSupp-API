@@ -25,8 +25,13 @@ public class BillEntity {
 
     @ManyToOne()
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "card_id", nullable = false)
+    @JoinColumn(name = "card_id")
     private CardEntity card;
+
+    @ManyToOne()
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "account_id")
+    private AccountEntity account;
 
     @Column(nullable = false)
     private LocalDate startDate;

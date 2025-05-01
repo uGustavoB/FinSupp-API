@@ -3,6 +3,7 @@ package com.ugustavob.finsuppapi.services;
 import com.ugustavob.finsuppapi.dto.subscription.CreateSubscriptionRequestDTO;
 import com.ugustavob.finsuppapi.dto.subscription.SubscriptionFilterDTO;
 import com.ugustavob.finsuppapi.dto.subscription.SubscriptionResponseDTO;
+import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
@@ -24,21 +25,27 @@ import java.util.UUID;
 public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final BillService billService;
-    private final CardService cardService;
 
-    public SubscriptionEntity createSubscription(CreateSubscriptionRequestDTO createSubscriptionRequestDTO, UUID userId) {
-        CardEntity card = cardService.getCardById(createSubscriptionRequestDTO.cardId(), userId);
+    public SubscriptionEntity createSubscription(
+            CreateSubscriptionRequestDTO createSubscriptionRequestDTO,
+            AccountEntity account,
+            UUID userId
+    ) {
+//        CardEntity card = cardService.getCardById(createSubscriptionRequestDTO.cardId(), userId);
 
         SubscriptionEntity subscription = new SubscriptionEntity();
         subscription.setDescription(createSubscriptionRequestDTO.description());
         subscription.setPrice(createSubscriptionRequestDTO.price());
         subscription.setInterval(createSubscriptionRequestDTO.interval());
         subscription.setStatus(createSubscriptionRequestDTO.status());
-        subscription.setCard(card);
+//        subscription.setCard(card);
+        subscription.setAccount(account);
 
         subscriptionRepository.save(subscription);
 
-        billService.addSubscriptionToBill(subscription);
+        if (createSubscriptionRequestDTO.status() == SubscriptionStatus.ACTIVE) {
+            billService.addSubscriptionToBill(subscription);
+        }
 
         return subscription;
     }
@@ -47,7 +54,7 @@ public class SubscriptionService {
         SubscriptionEntity subscription = subscriptionRepository.findById(id)
                 .orElseThrow(SubscriptionNotFoundException::new);
 
-        if (!subscription.getCard().getAccount().getUser().getId().equals(userId)) {
+        if (!subscription.getAccount().getUser().getId().equals(userId)) {
             throw new SubscriptionNotFoundException();
         }
 
@@ -72,10 +79,15 @@ public class SubscriptionService {
         return subscriptionRepository.existsByAccountId(accountId);
     }
 
-    public SubscriptionEntity updateSubscription(Integer id, @Valid CreateSubscriptionRequestDTO createSubscriptionRequestDTO, UUID userId) {
+    public SubscriptionEntity updateSubscription(
+            Integer id,
+            @Valid CreateSubscriptionRequestDTO createSubscriptionRequestDTO,
+            AccountEntity account,
+            UUID userId
+    ) {
         SubscriptionEntity subscription = getSubscriptionById(id, userId);
 
-        CardEntity card = cardService.getCardById(createSubscriptionRequestDTO.cardId(), userId);
+//        CardEntity card = cardService.getCardById(createSubscriptionRequestDTO.cardId(), userId);
 
         if (createSubscriptionRequestDTO.status() == SubscriptionStatus.INACTIVE && subscription.getStatus() != createSubscriptionRequestDTO.status()) {
             billService.removeSubscriptionFromBill(subscription);
@@ -89,7 +101,8 @@ public class SubscriptionService {
         subscription.setPrice(createSubscriptionRequestDTO.price());
         subscription.setInterval(createSubscriptionRequestDTO.interval());
         subscription.setStatus(createSubscriptionRequestDTO.status());
-        subscription.setCard(card);
+//        subscription.setCard(card);
+        subscription.setAccount(account);
 
         return subscriptionRepository.save(subscription);
     }

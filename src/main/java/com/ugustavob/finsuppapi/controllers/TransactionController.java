@@ -7,7 +7,6 @@ import com.ugustavob.finsuppapi.dto.transactions.TransactionFilterDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionType;
-import com.ugustavob.finsuppapi.exception.TransactionNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;

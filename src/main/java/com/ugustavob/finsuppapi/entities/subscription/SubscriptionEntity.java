@@ -36,6 +36,11 @@ public class SubscriptionEntity {
     private SubscriptionStatus status;
 
     @ManyToOne()
+    @JoinColumn(name = "account_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private AccountEntity account;
+
+    @ManyToOne()
     @JoinColumn(name = "card_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private CardEntity card;
@@ -47,7 +52,7 @@ public class SubscriptionEntity {
                 this.getPrice(),
                 this.getInterval(),
                 this.getStatus(),
-                this.getCard().getId()
+                this.getAccount().getId()
         );
         }
 }

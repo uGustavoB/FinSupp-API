@@ -9,6 +9,7 @@ public record SubscriptionResponseDTO(
     double price,
     SubscriptionInterval interval,
     SubscriptionStatus status,
-    Integer cardId
+    Integer accountId
+//    Integer cardId
 ) {
 }

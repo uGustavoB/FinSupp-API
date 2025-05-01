@@ -8,7 +8,8 @@ public record BillResponseDTO(
         Integer id,
         BillStatus status,
         Double totalAmount,
-        Integer cardId,
+//        Integer cardId,
+        Integer accountId,
         LocalDate startDate,
         LocalDate endDate,
         LocalDate dueDate

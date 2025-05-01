@@ -8,11 +8,12 @@ public record TransactionResponseDTO(
         Integer id,
         String description,
         Double amount,
+        boolean addToBill,
         Integer installments,
         LocalDate transactionDate,
         TransactionType type,
         Integer category,
-        Integer cardId,
+        Integer account,
         Integer recipientAccountId
 ) {
 }
