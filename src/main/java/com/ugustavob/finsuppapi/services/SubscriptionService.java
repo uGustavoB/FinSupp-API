@@ -79,28 +79,21 @@ public class SubscriptionService {
 
     public SubscriptionEntity updateSubscription(
             int id,
-            @Valid CreateSubscriptionRequestDTO createSubscriptionRequestDTO,
+            @Valid CreateSubscriptionRequestDTO dto,
             AccountEntity account,
             UUID userId
     ) {
         SubscriptionEntity subscription = getSubscriptionById(id, userId);
+        SubscriptionStatus oldStatus = subscription.getStatus();
 
-//        CardEntity card = cardService.getCardById(createSubscriptionRequestDTO.cardId(), userId);
-
-        if (createSubscriptionRequestDTO.status() == SubscriptionStatus.INACTIVE && subscription.getStatus() != createSubscriptionRequestDTO.status()) {
-            billService.removeSubscriptionFromBill(subscription);
-        }
-
-        if (createSubscriptionRequestDTO.status() == SubscriptionStatus.ACTIVE && subscription.getStatus() != createSubscriptionRequestDTO.status()) {
-            billService.addSubscriptionToBill(subscription);
-        }
-
-        subscription.setDescription(createSubscriptionRequestDTO.description());
-        subscription.setPrice(createSubscriptionRequestDTO.price());
-        subscription.setInterval(createSubscriptionRequestDTO.interval());
-        subscription.setStatus(createSubscriptionRequestDTO.status());
-//        subscription.setCard(card);
+        subscription.setDescription(dto.description());
+        subscription.setPrice(dto.price());
+        subscription.setInterval(dto.interval());
         subscription.setAccount(account);
+
+        billService.syncSubscriptionInBill(subscription, oldStatus, dto.status());
+
+        subscription.setStatus(dto.status());
 
         return subscriptionRepository.save(subscription);
     }

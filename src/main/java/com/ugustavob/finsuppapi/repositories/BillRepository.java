@@ -18,13 +18,13 @@ import java.util.stream.Stream;
 public interface BillRepository extends JpaRepository<BillEntity, Integer>, JpaSpecificationExecutor<BillEntity> {
     Optional<BillEntity> findById(Integer id);
 
-    @Query("SELECT b FROM BillEntity b WHERE b.card.account.user.id = :userId")
+    @Query("SELECT b FROM BillEntity b WHERE b.account.user.id = :userId")
     Page<BillEntity> findAllByUserId(@Param("userId") UUID userId, Pageable pageable);
 
-    @Query("SELECT b FROM BillEntity b WHERE b.card.account.user.id = :userId")
+    @Query("SELECT b FROM BillEntity b WHERE b.account.user.id = :userId")
     Optional<BillEntity> findAllByUserId(@Param("userId") UUID userId);
 
-    @Query("SELECT b FROM BillEntity b WHERE b.card.account = :account AND b.startDate = :startDate AND b.endDate = " +
+    @Query("SELECT b FROM BillEntity b WHERE b.account = :account AND b.startDate = :startDate AND b.endDate = " +
             ":endDate")
     BillEntity findByAccountAndDateRange(@Param("account") AccountEntity account,
                                          @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
@@ -64,7 +64,7 @@ public interface BillRepository extends JpaRepository<BillEntity, Integer>, JpaS
     @Query("SELECT b FROM BillEntity b " +
             "WHERE MONTH(b.startDate) = :month " +
             "AND YEAR(b.startDate) = :year " +
-            "AND b.card.account.user.id = :userId")
+            "AND b.account.user.id = :userId")
     Optional<BillEntity> findByStartDateMonthAndStartDateYearAndUserId(
             @Param("month") int month,
             @Param("year") int year,

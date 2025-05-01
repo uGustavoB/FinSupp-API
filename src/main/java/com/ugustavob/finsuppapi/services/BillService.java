@@ -10,11 +10,13 @@ import com.ugustavob.finsuppapi.entities.bill.BillStatus;
 import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.card.CardType;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
+import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.exception.BillNotFoundException;
 import com.ugustavob.finsuppapi.repositories.BillItemRepository;
 import com.ugustavob.finsuppapi.repositories.BillRepository;
 import com.ugustavob.finsuppapi.specifications.BillSpecification;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -63,15 +65,23 @@ public class BillService {
 
     public BillEntity findOrCreateBill(AccountEntity account, LocalDate transactionDate) {
         int closingDay = account.getClosingDay();
-        LocalDate startDate = transactionDate.withDayOfMonth(closingDay).plusDays(1);
+        int dueDay = account.getPaymentDueDay();
+
+        LocalDate closingDate;
+        if (transactionDate.getDayOfMonth() < closingDay) {
+            closingDate = transactionDate.withDayOfMonth(closingDay).minusMonths(1);
+        } else {
+            closingDate = transactionDate.withDayOfMonth(closingDay);
+        }
+
+        LocalDate startDate = closingDate.plusDays(1);
         LocalDate endDate = startDate.plusMonths(1).withDayOfMonth(closingDay);
-        LocalDate dueDate = endDate.withDayOfMonth(account.getPaymentDueDay());
+        LocalDate dueDate = endDate.withDayOfMonth(dueDay);
 
         BillEntity bill = billRepository.findByAccountAndDateRange(account, startDate, endDate);
 
         if (bill == null) {
             bill = new BillEntity();
-//            bill.setCard(card);
             bill.setAccount(account);
             bill.setStartDate(startDate);
             bill.setEndDate(endDate);
@@ -120,13 +130,19 @@ public class BillService {
     @Transactional
     public void addSubscriptionToBill(SubscriptionEntity subscription) {
         if (subscription == null || subscription.getAccount() == null) {
-            throw new IllegalArgumentException("Subscription, card or account cannot be null");
+            throw new IllegalArgumentException("Subscription or account cannot be null");
         }
 
         AccountEntity account = subscription.getAccount();
-
         LocalDate now = LocalDate.now();
-        LocalDate startDate = now.withDayOfMonth(account.getClosingDay()).plusDays(1);
+
+        LocalDate referenceDate;
+        if (now.getDayOfMonth() < account.getClosingDay()) {
+            referenceDate = now.withDayOfMonth(account.getClosingDay()).minusMonths(1);
+        } else {
+            referenceDate = now.withDayOfMonth(account.getClosingDay());
+        }
+        LocalDate startDate = referenceDate.plusDays(1);
 
         int totalInstallments = switch (subscription.getInterval()) {
             case MONTHLY -> 1;
@@ -171,6 +187,38 @@ public class BillService {
         }
 
         billItemRepository.saveAll(itemsToSave);
+    }
+
+    public void syncSubscriptionInBill(SubscriptionEntity subscription,
+                                       SubscriptionStatus oldStatus,
+                                       SubscriptionStatus newStatus) {
+        if (oldStatus == SubscriptionStatus.ACTIVE && newStatus == SubscriptionStatus.INACTIVE) {
+            removeSubscriptionFromBill(subscription);
+
+        } else if (oldStatus == SubscriptionStatus.INACTIVE && newStatus == SubscriptionStatus.ACTIVE) {
+            addSubscriptionToBill(subscription);
+
+        } else if (oldStatus == SubscriptionStatus.ACTIVE && newStatus == SubscriptionStatus.ACTIVE) {
+            updateSubscriptionInBill(subscription);
+        }
+    }
+
+    private void updateSubscriptionInBill(SubscriptionEntity subscription) {
+        BillItemEntity item = billItemRepository
+                .findBySubscriptionId(subscription.getId())
+                .orElse(null);
+
+        if (item == null) {
+            return;
+        }
+
+        BillEntity bill = item.getBill();
+        bill.setTotalAmount(bill.getTotalAmount() - item.getAmount() + subscription.getPrice());
+
+        item.setAmount(subscription.getPrice());
+
+        billItemRepository.save(item);
+        billRepository.save(bill);
     }
 
     @Transactional
