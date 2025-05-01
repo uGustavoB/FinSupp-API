@@ -4,6 +4,7 @@ import com.ugustavob.finsuppapi.dto.ErrorResponseDTO;
 import com.ugustavob.finsuppapi.dto.SuccessResponseDTO;
 import com.ugustavob.finsuppapi.dto.subscription.CreateSubscriptionRequestDTO;
 import com.ugustavob.finsuppapi.dto.subscription.SubscriptionFilterDTO;
+import com.ugustavob.finsuppapi.dto.subscription.SubscriptionResponseDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionInterval;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +65,7 @@ public class SubscriptionController {
                                                                 "price": 12,
                                                                 "interval": "MONTHLY",
                                                                 "status": "ACTIVE",
-                                                                "cardId": 1
+                                                                "accountId": 1
                                                               }
                                                             }
                                                             """,
@@ -159,16 +161,22 @@ public class SubscriptionController {
                                                             {
                                                               "message": "Subscriptions retrieved",
                                                               "type": "Success",
-                                                              "data": [
+                                                              "dataList": [
                                                                 {
                                                                   "id": 1,
                                                                   "description": "Spotify",
                                                                   "price": 12,
                                                                   "interval": "MONTHLY",
                                                                   "status": "ACTIVE",
-                                                                  "cardId": 1
+                                                                  "accountId": 1
                                                                 }
-                                                              ]
+                                                              ],
+                                                              "pagination": {
+                                                                "currentPage": 0,
+                                                                "pageSize": 10,
+                                                                "totalPages": 1,
+                                                                "totalElements": 7
+                                                              }
                                                             }
                                                             """,
                                                     summary = "Subscriptions retrieved"
@@ -236,7 +244,6 @@ public class SubscriptionController {
             @RequestParam(required = false) String description,
             @RequestParam(required = false) SubscriptionInterval interval,
             @RequestParam(required = false) SubscriptionStatus status,
-            @RequestParam(required = false) Integer cardId,
             @RequestParam(defaultValue = "0", required = false) int page,
             @RequestParam(defaultValue = "10", required = false) int size,
             HttpServletRequest request
@@ -248,11 +255,10 @@ public class SubscriptionController {
                 accountId,
                 description,
                 interval,
-                status,
-                cardId
+                status
         );
 
-        var subscriptions = subscriptionService.getAllSubscriptionsFromUser(filter, page, size);
+        Page<SubscriptionResponseDTO> subscriptions = subscriptionService.getAllSubscriptionsFromUser(filter, page, size);
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Subscriptions retrieved",
@@ -276,15 +282,15 @@ public class SubscriptionController {
                                                     name = "Success",
                                                     value = """
                                                             {
-                                                              "message": "Subscription created",
+                                                              "message": "Subscription updated",
                                                               "type": "Success",
                                                               "data": {
-                                                                "id": 1,
-                                                                "description": "Spotify",
-                                                                "price": 12,
+                                                                "id": 10,
+                                                                "description": "Netflix",
+                                                                "price": 29.9,
                                                                 "interval": "MONTHLY",
-                                                                "status": "ACTIVE",
-                                                                "cardId": 1
+                                                                "status": "INACTIVE",
+                                                                "accountId": 1
                                                               }
                                                             }
                                                             """,

@@ -17,5 +17,4 @@ public class SubscriptionFilterDTO {
     private String description;
     private SubscriptionInterval interval;
     private SubscriptionStatus status;
-    private Integer cardId;
 }

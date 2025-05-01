@@ -70,7 +70,7 @@ public class TransactionService {
             }
         }
 
-        int installments = createTransactionRequestDTO.installments() == null ? 1 :
+        int installments = createTransactionRequestDTO.installments() == null ? 0 :
                 createTransactionRequestDTO.installments();
 
         if (!createTransactionRequestDTO.addToBill() && installments >= 2) {

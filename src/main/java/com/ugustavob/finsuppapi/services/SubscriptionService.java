@@ -4,7 +4,6 @@ import com.ugustavob.finsuppapi.dto.subscription.CreateSubscriptionRequestDTO;
 import com.ugustavob.finsuppapi.dto.subscription.SubscriptionFilterDTO;
 import com.ugustavob.finsuppapi.dto.subscription.SubscriptionResponseDTO;
 import com.ugustavob.finsuppapi.entities.account.AccountEntity;
-import com.ugustavob.finsuppapi.entities.card.CardEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
 import com.ugustavob.finsuppapi.exception.SubscriptionNotFoundException;
@@ -50,9 +49,8 @@ public class SubscriptionService {
         return subscription;
     }
 
-    public SubscriptionEntity getSubscriptionById(Integer id, UUID userId) {
-        SubscriptionEntity subscription = subscriptionRepository.findById(id)
-                .orElseThrow(SubscriptionNotFoundException::new);
+    public SubscriptionEntity getSubscriptionById(int id, UUID userId) {
+        SubscriptionEntity subscription = subscriptionRepository.findById(id).orElseThrow(SubscriptionNotFoundException::new);
 
         if (!subscription.getAccount().getUser().getId().equals(userId)) {
             throw new SubscriptionNotFoundException();
@@ -80,7 +78,7 @@ public class SubscriptionService {
     }
 
     public SubscriptionEntity updateSubscription(
-            Integer id,
+            int id,
             @Valid CreateSubscriptionRequestDTO createSubscriptionRequestDTO,
             AccountEntity account,
             UUID userId

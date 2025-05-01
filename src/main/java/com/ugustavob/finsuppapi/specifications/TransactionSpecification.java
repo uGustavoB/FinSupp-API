@@ -12,11 +12,11 @@ public class TransactionSpecification {
             Predicate predicate = criteriaBuilder.conjunction();
 
             if (filter.getUserId() != null) {
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("card").get("account").get("user").get("id"), filter.getUserId()));
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("account").get("user").get("id"), filter.getUserId()));
             }
 
             if (filter.getAccountId() != null) {
-                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("card").get("account").get("id"), filter.getAccountId()));
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("account").get("id"), filter.getAccountId()));
             }
 
             if (filter.getDescription() != null) {

@@ -119,12 +119,11 @@ public class BillService {
 
     @Transactional
     public void addSubscriptionToBill(SubscriptionEntity subscription) {
-        if (subscription == null || subscription.getCard() == null || subscription.getCard().getAccount() == null) {
+        if (subscription == null || subscription.getAccount() == null) {
             throw new IllegalArgumentException("Subscription, card or account cannot be null");
         }
 
-        CardEntity card = subscription.getCard();
-        AccountEntity account = card.getAccount();
+        AccountEntity account = subscription.getAccount();
 
         LocalDate now = LocalDate.now();
         LocalDate startDate = now.withDayOfMonth(account.getClosingDay()).plusDays(1);
@@ -148,7 +147,7 @@ public class BillService {
 
         for (int installmentNumber = 1; installmentNumber <= totalInstallments; installmentNumber++) {
             BillEntity bill = findOrCreateBill(
-                    subscription.getCard().getAccount(),
+                    subscription.getAccount(),
                     startDate
             );
 

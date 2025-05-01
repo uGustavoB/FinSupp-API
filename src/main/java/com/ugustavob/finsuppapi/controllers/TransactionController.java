@@ -59,39 +59,41 @@ public class TransactionController {
                                                     name = "Success",
                                                     value = """
                                                             {
-                                                              "message": "Transactions retrieved",
-                                                              "type": "Success",
-                                                              "dataList": [
-                                                                {
-                                                                  "id": 1,
-                                                                  "description": "Minecraft Movie",
-                                                                  "amount": 50,
-                                                                  "installments": 1,
-                                                                  "transactionDate": "2025-04-09",
-                                                                  "type": "WITHDRAW",
-                                                                  "category": 4,
-                                                                  "cardId": 1,
-                                                                  "recipientAccountId": null
-                                                                },
-                                                                {
-                                                                  "id": 2,
-                                                                  "description": "Cookies",
-                                                                  "amount": 45,
-                                                                  "installments": 1,
-                                                                  "transactionDate": "2025-04-13",
-                                                                  "type": "WITHDRAW",
-                                                                  "category": 1,
-                                                                  "cardId": 1,
-                                                                  "recipientAccountId": null
-                                                                }
-                                                              ],
-                                                              "pagination": {
-                                                                "currentPage": 0,
-                                                                "pageSize": 10,
-                                                                "totalPages": 1,
-                                                                "totalElements": 2
-                                                              }
-                                                            }
+                                                               "message": "Transactions retrieved",
+                                                               "type": "Success",
+                                                               "dataList": [
+                                                                 {
+                                                                   "id": 1,
+                                                                   "description": "Minecraft Movie",
+                                                                   "amount": 50,
+                                                                   "addToBill": true,
+                                                                   "installments": 1,
+                                                                   "transactionDate": "2025-04-09",
+                                                                   "type": "WITHDRAW",
+                                                                   "category": 4,
+                                                                   "account": 1,
+                                                                   "recipientAccountId": null
+                                                                 },
+                                                                 {
+                                                                   "id": 2,
+                                                                   "description": "New Clothes",
+                                                                   "amount": 100,
+                                                                   "addToBill": true,
+                                                                   "installments": 2,
+                                                                   "transactionDate": "2025-04-13",
+                                                                   "type": "WITHDRAW",
+                                                                   "category": 7,
+                                                                   "account": 1,
+                                                                   "recipientAccountId": null
+                                                                 }
+                                                               ],
+                                                               "pagination": {
+                                                                 "currentPage": 0,
+                                                                 "pageSize": 10,
+                                                                 "totalPages": 1,
+                                                                 "totalElements": 2
+                                                               }
+                                                             }
                                                             """,
                                                     summary = "Successful response"
                                             )
@@ -145,7 +147,8 @@ public class TransactionController {
                                                     summary = "User not found"
                                             ),
                                             @ExampleObject(
-                                                    name = "This occurs when no transaction is found according to the filters",
+                                                    name = "This occurs when no transaction is found according to the" +
+                                                            " filters",
                                                     value = """
                                                             {
                                                               "message": "Transactions not found",
@@ -219,11 +222,12 @@ public class TransactionController {
                                                                 "id": 1,
                                                                 "description": "Minecraft Movie",
                                                                 "amount": 50,
+                                                                "addToBill": true,
                                                                 "installments": 1,
                                                                 "transactionDate": "2025-04-09",
                                                                 "type": "WITHDRAW",
                                                                 "category": 4,
-                                                                "cardId": 1,
+                                                                "account": 1,
                                                                 "recipientAccountId": null
                                                               }
                                                             }
@@ -323,11 +327,12 @@ public class TransactionController {
                                                                 "id": 1,
                                                                 "description": "Minecraft Movie",
                                                                 "amount": 50,
+                                                                "addToBill": true,
                                                                 "installments": 1,
                                                                 "transactionDate": "2025-04-09",
                                                                 "type": "WITHDRAW",
                                                                 "category": 4,
-                                                                "cardId": 1,
+                                                                "account": 1,
                                                                 "recipientAccountId": null
                                                               }
                                                             }
@@ -562,13 +567,14 @@ public class TransactionController {
                                                               "data": {
                                                                 "id": 1,
                                                                 "description": "Minecraft Movie",
-                                                                "amount": 50,
+                                                                "amount": 100,
+                                                                "addToBill": true,
                                                                 "installments": 1,
                                                                 "transactionDate": "2025-04-09",
                                                                 "type": "WITHDRAW",
                                                                 "category": 4,
-                                                                "cardId": 1,
-                                                                "recipientAccountId": 8
+                                                                "account": 1,
+                                                                "recipientAccountId": null
                                                               }
                                                             }
                                                             """,
@@ -881,7 +887,8 @@ public class TransactionController {
                                     ),
                                     examples = {
                                             @ExampleObject(
-                                                    name = "This occurs when the transaction does not belong to the user.",
+                                                    name = "This occurs when the transaction does not belong to the " +
+                                                            "user.",
                                                     value = """
                                                             {
                                                               "code": 422,
@@ -893,7 +900,8 @@ public class TransactionController {
                                                     summary = "Transaction does not belong to the user"
                                             ),
                                             @ExampleObject(
-                                                    name = "This occurs when the transaction is linked to a bill that is not open.",
+                                                    name = "This occurs when the transaction is linked to a bill that" +
+                                                            " is not open.",
                                                     value = """
                                                             {
                                                               "code": 422,

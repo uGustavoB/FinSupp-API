@@ -69,7 +69,7 @@ public class BillController {
                                                                   "id": 1,
                                                                   "status": "OPEN",
                                                                   "totalAmount": 112,
-                                                                  "cardId": 1,
+                                                                  "accountId": 1,
                                                                   "startDate": "2025-04-04",
                                                                   "endDate": "2025-05-03",
                                                                   "dueDate": "2025-05-10"
@@ -78,7 +78,7 @@ public class BillController {
                                                                   "id": 2,
                                                                   "status": "OPEN",
                                                                   "totalAmount": 50,
-                                                                  "cardId": 1,
+                                                                  "accountId": 1,
                                                                   "startDate": "2025-05-04",
                                                                   "endDate": "2025-06-03",
                                                                   "dueDate": "2025-06-10"
@@ -343,7 +343,7 @@ public class BillController {
                                                                 "id": 1,
                                                                 "status": "PAID",
                                                                 "totalAmount": 112,
-                                                                "cardId": 1,
+                                                                "accountId": 1,
                                                                 "startDate": "2025-04-04",
                                                                 "endDate": "2025-05-03",
                                                                 "dueDate": "2025-05-10"

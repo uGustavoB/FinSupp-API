@@ -13,7 +13,7 @@ public record TransactionResponseDTO(
         LocalDate transactionDate,
         TransactionType type,
         Integer category,
-        Integer account,
+        Integer accountId,
         Integer recipientAccountId
 ) {
 }

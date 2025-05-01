@@ -8,11 +8,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface SubscriptionRepository  extends JpaRepository<SubscriptionEntity, Integer>, JpaSpecificationExecutor<SubscriptionEntity> {
     @Query("SELECT s FROM SubscriptionEntity s WHERE s.card.account.user.id = :userId")
     Page<SubscriptionEntity> findAllByCard_Account_User_Id(@Param("userId") UUID userId, Pageable pageable);
+
+    @Query("SELECT s FROM SubscriptionEntity s WHERE s.id = :id")
+    Optional<SubscriptionEntity> findById(@Param("id") int id);
 
     @Query("SELECT COUNT(s) > 0 FROM SubscriptionEntity s WHERE s.card.account.id = :accountId AND s.status = 'ACTIVE'")
     boolean existsByAccountId(@Param("accountId") Integer accountId);

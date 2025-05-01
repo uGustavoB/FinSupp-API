@@ -41,7 +41,7 @@ public class SubscriptionEntity {
     private AccountEntity account;
 
     @ManyToOne()
-    @JoinColumn(name = "card_id", nullable = false)
+    @JoinColumn(name = "card_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private CardEntity card;
 
