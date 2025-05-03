@@ -29,7 +29,7 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(cron = "${app.bill-processing.cron:0 0 3 * * ?}")
+    @Scheduled(cron = "${app.bill-processing.cron}", zone = "${app.bill-processing.timezone}")
     public void scheduledBillProcessing() {
         try {
             billBatchService.processBillsStatusUpdates();
