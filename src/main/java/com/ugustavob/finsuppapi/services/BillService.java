@@ -25,6 +25,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -134,7 +135,7 @@ public class BillService {
         }
 
         AccountEntity account = subscription.getAccount();
-        LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
 
         LocalDate referenceDate;
         if (now.getDayOfMonth() < account.getClosingDay()) {
@@ -250,7 +251,7 @@ public class BillService {
             if (bill.getTotalAmount() == 0) {
                 billRepository.delete(bill);
             } else {
-                if (bill.getDueDate().isBefore(LocalDate.now())) {
+                if (bill.getDueDate().isBefore(LocalDate.now(ZoneId.of("America/Sao_Paulo")))) {
                     bill.setStatus(BillStatus.OVERDUE);
                 } else {
                     bill.setStatus(BillStatus.OPEN);
@@ -280,7 +281,7 @@ public class BillService {
             throw new IllegalStateException("Bill is not paid");
         }
 
-        if (bill.getDueDate().isBefore(LocalDate.now())) {
+        if (bill.getDueDate().isBefore(LocalDate.now(ZoneId.of("America/Sao_Paulo")))) {
             bill.setStatus(BillStatus.OVERDUE);
         } else {
             bill.setStatus(BillStatus.OPEN);

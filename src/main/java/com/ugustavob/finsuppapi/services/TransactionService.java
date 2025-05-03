@@ -28,6 +28,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -346,7 +347,7 @@ public class TransactionService {
         transaction.setTransactionType(TransactionType.WITHDRAW);
 //        transaction.setCard(card);
         transaction.setAccount(account);
-        transaction.setTransactionDate(LocalDate.now());
+        transaction.setTransactionDate(LocalDate.now(ZoneId.of("America/Sao_Paulo")));
         transaction.setCategory(category);
         transaction.setRecipientAccount(null);
         transaction.setInstallments(1);

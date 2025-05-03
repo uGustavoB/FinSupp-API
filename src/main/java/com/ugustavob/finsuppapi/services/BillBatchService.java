@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.function.Function;
 
@@ -26,7 +27,7 @@ public class BillBatchService {
 
     @Transactional
     public void processBillsStatusUpdates() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
 
         log.info("Iniciando atualização de faturas para {}", today);
 
