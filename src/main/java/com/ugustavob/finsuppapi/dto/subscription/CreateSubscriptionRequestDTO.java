@@ -27,9 +27,5 @@ public record CreateSubscriptionRequestDTO(
         @Positive(message = "Account ID must be positive")
         @NotNull(message = "Account ID cannot be null")
         Integer accountId
-//        @Schema(description = "Card ID associated with the subscription", example = "1")
-//        @Positive(message = "Card ID must be positive")
-//        @NotNull(message = "Account ID cannot be null")
-//        Integer cardId
 ) {
 }

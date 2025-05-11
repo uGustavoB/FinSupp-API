@@ -67,7 +67,6 @@ public class ExceptionHandlerController {
                 HttpStatus.BAD_REQUEST);
     }
 
-//    Gustavo - corrigir depois para exibir no dataList
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
         return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),
@@ -94,7 +93,6 @@ public class ExceptionHandlerController {
     }
 
 //  Category Exceptions
-//    Gustavo - corrigir depois para exibir no dataList
     @ExceptionHandler(CategoryDescriptionAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDTO> handleCategoryDescriptionAlreadyExistsException(CategoryDescriptionAlreadyExistsException e) {
         return new ResponseEntity<>(ErrorResponseDTO.builder().message(e.getMessage()).code(409).build(),

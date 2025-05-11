@@ -30,14 +30,12 @@ public class SubscriptionService {
             AccountEntity account,
             UUID userId
     ) {
-//        CardEntity card = cardService.getCardById(createSubscriptionRequestDTO.cardId(), userId);
 
         SubscriptionEntity subscription = new SubscriptionEntity();
         subscription.setDescription(createSubscriptionRequestDTO.description());
         subscription.setPrice(createSubscriptionRequestDTO.price());
         subscription.setInterval(createSubscriptionRequestDTO.interval());
         subscription.setStatus(createSubscriptionRequestDTO.status());
-//        subscription.setCard(card);
         subscription.setAccount(account);
 
         subscriptionRepository.save(subscription);

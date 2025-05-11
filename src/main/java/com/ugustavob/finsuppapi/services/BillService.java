@@ -43,7 +43,6 @@ public class BillService {
                 bill.getId(),
                 bill.getStatus(),
                 bill.getTotalAmount(),
-//                bill.getCard() != null ? bill.getCard().getId() : null,
                 bill.getAccount() != null ? bill.getAccount().getId() : null,
                 bill.getStartDate(),
                 bill.getEndDate(),

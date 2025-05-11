@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -54,8 +55,6 @@ public class TransactionService {
     }
 
     public TransactionEntityFinder getAndValidateTransactionEntities(CreateTransactionRequestDTO createTransactionRequestDTO) {
-//        CardEntity card = cardRepository.findById(createTransactionRequestDTO.cardId())
-//                .orElseThrow(CardNotFoundException::new);
 
         AccountEntity account = accountRepository.findById(createTransactionRequestDTO.accountId())
                 .orElseThrow(AccountNotFoundException::new);
@@ -93,8 +92,8 @@ public class TransactionService {
         newTransaction.setTransactionType(createTransactionRequestDTO.type());
         newTransaction.setCategory(transactionEntityFinder.getCategory());
         newTransaction.setAccount(transactionEntityFinder.getAccount());
+        System.out.println(createTransactionRequestDTO.addToBill());
         newTransaction.setAddToBill(createTransactionRequestDTO.addToBill());
-//        newTransaction.setCard(transactionEntityFinder.getCard());
         newTransaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
 
         if (createTransactionRequestDTO.installments() != null && createTransactionRequestDTO.installments() > 0) {
@@ -109,7 +108,7 @@ public class TransactionService {
     }
 
     public Page<TransactionResponseDTO> getAllTransactionsFromUser(TransactionFilterDTO filter, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "transactionDate"));
 
         Specification<TransactionEntity> specification = TransactionSpecification.filter(filter);
 
@@ -132,7 +131,6 @@ public class TransactionService {
                 transaction.getTransactionDate(),
                 transaction.getTransactionType(),
                 transaction.getCategory().getId(),
-//                transaction.getCard() != null ? transaction.getCard().getId() : null,
                 transaction.getAccount() != null ? transaction.getAccount().getId() : null,
                 transaction.getRecipientAccount() != null ? transaction.getRecipientAccount().getId() : null
         );
@@ -201,7 +199,6 @@ public class TransactionService {
         transaction.setCategory(transactionEntityFinder.getCategory());
         transaction.setAccount(transactionEntityFinder.getAccount());
         transaction.setAddToBill(createTransactionRequestDTO.addToBill());
-//        transaction.setCard(transactionEntityFinder.getCard());
         transaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
 
         if (createTransactionRequestDTO.installments() != null || createTransactionRequestDTO.installments() > 0) {
@@ -285,15 +282,18 @@ public class TransactionService {
 
         switch (transaction.getTransactionType()) {
             case DEPOSIT:
-                transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
+                if (!transactionEntityFinder.isAddToBill()) {
+                    transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() + transaction.getAmount());
+                }
                 break;
             case WITHDRAW:
-                if (!transactionEntityFinder.isAddToBill()) {
+                if (!transaction.isAddToBill()) {
+                    System.out.println("WITHDRAW");
                     transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() - transaction.getAmount());
                 }
                 break;
             case TRANSFER:
-                if (!transactionEntityFinder.isAddToBill()) {
+                if (!transaction.isAddToBill()) {
                     transactionEntityFinder.getAccount().setBalance(transactionEntityFinder.getAccount().getBalance() - transaction.getAmount());
                     transactionEntityFinder.getRecipientAccount().setBalance(transactionEntityFinder.getRecipientAccount().getBalance() + transaction.getAmount());
                 }
@@ -336,16 +336,10 @@ public class TransactionService {
         CategoryEntity category = categoryRepository.findByDescription("Bill Payments")
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
 
-//        CardEntity card =
-//                cardRepository.findDebitCardByAccountId(account.getId()).orElseThrow(() -> new CardNotFoundException(
-//                        "Debit " +
-//                                "Card not found"));
-
         TransactionEntity transaction = new TransactionEntity();
         transaction.setDescription("Payment of the bill: " + bill.getStartDate().getMonthValue() + "/" + bill.getStartDate().getYear());
         transaction.setAmount(bill.getTotalAmount());
         transaction.setTransactionType(TransactionType.WITHDRAW);
-//        transaction.setCard(card);
         transaction.setAccount(account);
         transaction.setTransactionDate(LocalDate.now(ZoneId.of("America/Sao_Paulo")));
         transaction.setCategory(category);

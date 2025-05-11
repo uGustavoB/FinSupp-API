@@ -10,6 +10,5 @@ public record SubscriptionResponseDTO(
     SubscriptionInterval interval,
     SubscriptionStatus status,
     Integer accountId
-//    Integer cardId
 ) {
 }
