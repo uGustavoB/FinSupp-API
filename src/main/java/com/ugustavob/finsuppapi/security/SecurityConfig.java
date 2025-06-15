@@ -62,7 +62,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:4200", "http://finsupp-v0.vercel.app", "http://finsupp.vercel.app"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:4200", "http://finsupp-v0.vercel.app", "http://finsupp.vercel.app", "http://finsupp-dev.vercel.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setExposedHeaders(List.of("Authorization"));
