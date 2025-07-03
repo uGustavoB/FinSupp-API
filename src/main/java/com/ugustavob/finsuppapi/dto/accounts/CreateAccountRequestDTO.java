@@ -15,7 +15,6 @@ public record CreateAccountRequestDTO(
         AccountType accountType,
         @Positive(message = "Bank ID must be positive")
         Integer bank,
-        @Positive(message = "Balance must be positive")
         @Min(value = 0, message = "Balance must be positive")
         @Max(value = 999999999, message = "Balance must be less than 1 billion")
         @Schema(description = "Initial balance of the account", example = "1000.00")
