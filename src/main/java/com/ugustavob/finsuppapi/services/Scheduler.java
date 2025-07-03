@@ -1,6 +1,8 @@
 package com.ugustavob.finsuppapi.services;
 
+import com.ugustavob.finsuppapi.entities.bank.BankEntity;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
+import com.ugustavob.finsuppapi.repositories.BankRepository;
 import com.ugustavob.finsuppapi.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ public class Scheduler {
     private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
     private final BillBatchService billBatchService;
     private final CategoryRepository categoryRepository;
+    private final BankRepository bankRepository;
 
     @EventListener(ApplicationReadyEvent.class)
     public void onStartup() {
@@ -58,6 +61,32 @@ public class Scheduler {
             log.info("Default categories created successfully");
         } else {
             log.info("Default categories already exist");
+        }
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void createDefaultBanks() {
+        if (bankRepository.count() == 0) {
+            log.info("Creating default banks...");
+            List<BankEntity> defaultBanks = List.of(
+                    new BankEntity("Nubank"),
+                    new BankEntity("Itaú"),
+                    new BankEntity("Bradesco"),
+                    new BankEntity("Santander"),
+                    new BankEntity("Caixa"),
+                    new BankEntity("Banco do Brasil"),
+                    new BankEntity("PicPay"),
+                    new BankEntity("Mercado Pago"),
+                    new BankEntity("Inter"),
+                    new BankEntity("PagBank"),
+                    new BankEntity("C6 Bank"),
+                    new BankEntity("Banco Pan"),
+                    new BankEntity("Neon")
+            );
+            bankRepository.saveAll(defaultBanks);
+            log.info("Default banks created successfully");
+        } else {
+            log.info("Default banks already exist");
         }
     }
 }

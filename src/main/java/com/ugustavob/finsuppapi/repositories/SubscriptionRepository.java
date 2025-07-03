@@ -18,6 +18,6 @@ public interface SubscriptionRepository  extends JpaRepository<SubscriptionEntit
     @Query("SELECT s FROM SubscriptionEntity s WHERE s.id = :id")
     Optional<SubscriptionEntity> findById(@Param("id") int id);
 
-    @Query("SELECT COUNT(s) > 0 FROM SubscriptionEntity s WHERE s.card.account.id = :accountId AND s.status = 'ACTIVE'")
+    @Query("SELECT COUNT(s) > 0 FROM SubscriptionEntity s WHERE s.account.id = :accountId AND s.status = 'ACTIVE'")
     boolean existsByAccountId(@Param("accountId") Integer accountId);
 }
