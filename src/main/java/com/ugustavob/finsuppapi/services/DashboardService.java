@@ -1,9 +1,11 @@
 package com.ugustavob.finsuppapi.services;
 
+import com.ugustavob.finsuppapi.dto.dashboard.CategoriesSummaryResponseDTO;
 import com.ugustavob.finsuppapi.dto.dashboard.SummaryResponseDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,5 +37,9 @@ public class DashboardService {
                 totalInvestments,
                 totalValueForActiveSubscriptions
         );
+    }
+
+    public List<CategoriesSummaryResponseDTO> getCategoriesSummary(UUID userId) {
+        return transactionService.getMonthlyExpensesByCategory(userId);
     }
 }

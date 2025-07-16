@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.services;
 
+import com.ugustavob.finsuppapi.dto.dashboard.CategoriesSummaryResponseDTO;
 import com.ugustavob.finsuppapi.dto.transactions.CreateTransactionRequestDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionFilterDTO;
 import com.ugustavob.finsuppapi.dto.transactions.TransactionResponseDTO;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -374,5 +376,10 @@ public class TransactionService {
     public double getTotalAmountExpenses(UUID userId) {
         LocalDate now = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
         return transactionRepository.sumExpensesByUserAndDateRange(userId, now.withDayOfMonth(1), now.withDayOfMonth(now.lengthOfMonth()));
+    }
+
+    public List<CategoriesSummaryResponseDTO> getMonthlyExpensesByCategory(UUID userId) {
+    LocalDate now = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        return transactionRepository.getMonthlyExpensesByCategory(userId, now.withDayOfMonth(1), now.withDayOfMonth(now.lengthOfMonth()));
     }
 }

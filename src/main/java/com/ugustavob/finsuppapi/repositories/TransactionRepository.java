@@ -1,5 +1,6 @@
 package com.ugustavob.finsuppapi.repositories;
 
+import com.ugustavob.finsuppapi.dto.dashboard.CategoriesSummaryResponseDTO;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,6 +64,16 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             "AND (t.transactionType = 'WITHDRAW' OR t.transactionType = 'TRANSFER')" +
             "AND t.transactionDate BETWEEN :startDate AND :endDate")
     Double sumExpensesByUserAndDateRange(
+            @Param("userId") UUID userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT new com.ugustavob.finsuppapi.dto.dashboard.CategoriesSummaryResponseDTO(c.description, SUM(t.amount)) " +
+            "FROM TransactionEntity t JOIN t.category c " +
+            "WHERE t.transactionType = 'WITHDRAW' AND t.account.user.id = :userId " +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate " +
+            "GROUP BY c.description")
+    List<CategoriesSummaryResponseDTO> getMonthlyExpensesByCategory(
             @Param("userId") UUID userId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
