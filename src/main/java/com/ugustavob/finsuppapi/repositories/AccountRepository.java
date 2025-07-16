@@ -22,6 +22,18 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Integer>
 
     boolean existsByUserId(UUID userId);
 
+    @Query("SELECT COALESCE(SUM(a.balance), 0) " +
+        "FROM AccountEntity a " +
+        "WHERE a.user.id = :userId " +
+        "AND a.accountType = 'SAVINGS' ")
+    Double sumSavingsByUserId(UUID userId);
+
+    @Query("SELECT COALESCE(SUM(a.balance), 0) " +
+        "FROM AccountEntity a " +
+        "WHERE a.user.id = :userId " +
+        "AND a.accountType = 'INVESTMENT' ")
+    Double sumInvestmentsByUserId(UUID userId);
+
     default Optional<AccountEntity> deleteByIdAndReturnEntity(Integer id) {
         Optional<AccountEntity> account = findById(id);
 

@@ -95,4 +95,8 @@ public class SubscriptionService {
 
         return subscriptionRepository.save(subscription);
     }
+
+    public double getTotalValueForActiveSubscriptions(UUID userId) {
+        return subscriptionRepository.sumActiveSubscriptionsByUserId(userId);
+    }
 }

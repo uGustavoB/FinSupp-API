@@ -131,6 +131,14 @@ public class AccountService {
         }
     }
 
+    public double getTotalSavingsBalanceByUserId(UUID userId) {
+        return accountRepository.sumSavingsByUserId(userId);
+    }
+
+    public double getTotalInvestmentsBalanceByUserId(UUID userId) {
+        return accountRepository.sumInvestmentsByUserId(userId);
+    }
+
     public AccountResponseDTO entityToResponseDto(AccountEntity accountEntity) {
         return new AccountResponseDTO(
                 accountEntity.getId(),

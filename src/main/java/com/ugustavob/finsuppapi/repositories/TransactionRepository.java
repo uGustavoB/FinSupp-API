@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,4 +43,26 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
 
     @Query("SELECT COUNT(t) > 0 FROM TransactionEntity t WHERE t.account.id = :accountId")
     boolean existsByAccountId(@Param("accountId") Integer accountId);
+
+    @Query("SELECT COALESCE(SUM(t.amount), 0) " +
+            "FROM TransactionEntity t " +
+            "JOIN AccountEntity a ON t.account.id = a.id OR t.recipientAccount.id = a.id " +
+            "WHERE a.user.id = :userId " +
+            "AND (t.transactionType = 'DEPOSIT')" +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate")
+    Double sumEarningsByUserAndDateRange(
+            @Param("userId") UUID userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT COALESCE(SUM(t.amount), 0) " +
+            "FROM TransactionEntity t " +
+            "JOIN AccountEntity a ON t.account.id = a.id OR t.recipientAccount.id = a.id " +
+            "WHERE a.user.id = :userId " +
+            "AND (t.transactionType = 'WITHDRAW' OR t.transactionType = 'TRANSFER')" +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate")
+    Double sumExpensesByUserAndDateRange(
+            @Param("userId") UUID userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }

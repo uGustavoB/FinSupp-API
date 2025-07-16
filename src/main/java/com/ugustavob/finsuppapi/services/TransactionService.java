@@ -365,4 +365,14 @@ public class TransactionService {
     public boolean isCategoryAssociatedWithTransaction(int id) {
         return transactionRepository.existsByCategoryId(id);
     }
+
+    public double getTotalAmountIncome(UUID userId) {
+        LocalDate now = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        return transactionRepository.sumEarningsByUserAndDateRange(userId, now.withDayOfMonth(1), now.withDayOfMonth(now.lengthOfMonth()));
+    }
+
+    public double getTotalAmountExpenses(UUID userId) {
+        LocalDate now = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        return transactionRepository.sumExpensesByUserAndDateRange(userId, now.withDayOfMonth(1), now.withDayOfMonth(now.lengthOfMonth()));
+    }
 }

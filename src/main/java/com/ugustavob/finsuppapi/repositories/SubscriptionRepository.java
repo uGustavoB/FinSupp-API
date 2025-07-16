@@ -20,4 +20,7 @@ public interface SubscriptionRepository  extends JpaRepository<SubscriptionEntit
 
     @Query("SELECT COUNT(s) > 0 FROM SubscriptionEntity s WHERE s.account.id = :accountId AND s.status = 'ACTIVE'")
     boolean existsByAccountId(@Param("accountId") Integer accountId);
+
+    @Query("SELECT COALESCE(SUM(s.price), 0) FROM SubscriptionEntity s WHERE s.account.user.id = :userId AND s.status = 'ACTIVE'")
+    Double sumActiveSubscriptionsByUserId(@Param("userId") UUID userId);
 }
