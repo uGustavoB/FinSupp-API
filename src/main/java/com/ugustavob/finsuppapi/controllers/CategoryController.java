@@ -6,6 +6,7 @@ import com.ugustavob.finsuppapi.dto.categories.CategoryFilterDTO;
 import com.ugustavob.finsuppapi.dto.categories.CategoryResponseDTO;
 import com.ugustavob.finsuppapi.dto.categories.CreateCategoryRequestDTO;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
+import com.ugustavob.finsuppapi.entities.categories.CategoryVisibility;
 import com.ugustavob.finsuppapi.exception.CategoryNotFoundException;
 import com.ugustavob.finsuppapi.services.BaseService;
 import com.ugustavob.finsuppapi.services.CategoryService;
@@ -130,11 +131,12 @@ public class CategoryController {
     public ResponseEntity<?> getCategories(
             @RequestParam(required = false) Integer id,
             @RequestParam(required = false) String description,
+            @RequestParam(defaultValue = "PUBLIC") CategoryVisibility visibility,
             HttpServletRequest request
     ) {
         baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
 
-        CategoryFilterDTO categoryFilterDTO = new CategoryFilterDTO(id, description);
+        CategoryFilterDTO categoryFilterDTO = new CategoryFilterDTO(id, description, visibility);
 
         List<CategoryEntity> categories = categoryService.getAll(categoryFilterDTO);
 
@@ -241,7 +243,7 @@ public class CategoryController {
 
         return ResponseEntity.created(location).body(new SuccessResponseDTO<>(
                 "Category created",
-                new CategoryResponseDTO(categoryEntity.getId(), categoryEntity.getDescription())
+                new CategoryResponseDTO(categoryEntity.getId(), categoryEntity.getDescription(), categoryEntity.getVisibility())
         ));
     }
 
@@ -360,7 +362,7 @@ public class CategoryController {
 
         return ResponseEntity.ok(new SuccessResponseDTO<>(
                 "Category updated",
-                new CategoryResponseDTO(updatedCategory.getId(), updatedCategory.getDescription())
+                new CategoryResponseDTO(updatedCategory.getId(), updatedCategory.getDescription(), updatedCategory.getVisibility())
         ));
     }
 

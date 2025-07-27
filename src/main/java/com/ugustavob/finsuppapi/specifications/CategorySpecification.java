@@ -2,6 +2,7 @@ package com.ugustavob.finsuppapi.specifications;
 
 import com.ugustavob.finsuppapi.dto.categories.CategoryFilterDTO;
 import com.ugustavob.finsuppapi.entities.categories.CategoryEntity;
+import com.ugustavob.finsuppapi.entities.categories.CategoryVisibility;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -19,6 +20,10 @@ public class CategorySpecification {
 
             if (filter.getId() != null) {
                 predicate = criteriaBuilder.equal(root.get("id"), filter.getId());
+            }
+
+            if (filter.getVisibility() != null && filter.getVisibility() != CategoryVisibility.ALL) {
+                predicate = criteriaBuilder.equal(root.get("visibility"), filter.getVisibility());
             }
 
             return predicate;

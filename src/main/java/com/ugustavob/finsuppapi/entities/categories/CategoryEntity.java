@@ -16,7 +16,12 @@ public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(nullable = false)
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private CategoryVisibility visibility = CategoryVisibility.PUBLIC;
 
     public CategoryEntity(String description) {
         this.description = description;
