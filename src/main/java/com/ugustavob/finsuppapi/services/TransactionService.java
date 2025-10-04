@@ -94,7 +94,6 @@ public class TransactionService {
         newTransaction.setTransactionType(createTransactionRequestDTO.type());
         newTransaction.setCategory(transactionEntityFinder.getCategory());
         newTransaction.setAccount(transactionEntityFinder.getAccount());
-        System.out.println(createTransactionRequestDTO.addToBill());
         newTransaction.setAddToBill(createTransactionRequestDTO.addToBill());
         newTransaction.setRecipientAccount(transactionEntityFinder.getRecipientAccount());
 

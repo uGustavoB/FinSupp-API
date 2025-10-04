@@ -62,7 +62,9 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             "JOIN AccountEntity a ON t.account.id = a.id OR t.recipientAccount.id = a.id " +
             "WHERE a.user.id = :userId " +
             "AND (t.transactionType = 'WITHDRAW' OR t.transactionType = 'TRANSFER')" +
-            "AND t.transactionDate BETWEEN :startDate AND :endDate")
+            "AND t.transactionDate BETWEEN :startDate AND :endDate " +
+            "AND t.category.description != 'Bill Payments'"
+    )
     Double sumExpensesByUserAndDateRange(
             @Param("userId") UUID userId,
             @Param("startDate") LocalDate startDate,
@@ -72,6 +74,7 @@ public interface TransactionRepository extends JpaRepository<TransactionEntity, 
             "FROM TransactionEntity t JOIN t.category c " +
             "WHERE t.transactionType = 'WITHDRAW' AND t.account.user.id = :userId " +
             "AND t.transactionDate BETWEEN :startDate AND :endDate " +
+            "AND c.description != 'Bill Payments' " +
             "GROUP BY c.description")
     List<CategoriesSummaryResponseDTO> getMonthlyExpensesByCategory(
             @Param("userId") UUID userId,
