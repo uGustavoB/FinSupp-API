@@ -68,9 +68,11 @@ public class SecurityConfig {
             "http://finsupp-v0.vercel.app",
             "http://finsupp.vercel.app",
             "http://finsupp-dev.vercel.app",
+            "http://finsupp-gps.vercel.app",
             "https://finsupp-v0.vercel.app",
             "https://finsupp.vercel.app",
-            "https://finsupp-dev.vercel.app"
+            "https://finsupp-dev.vercel.app",
+            "https://finsupp-gps.vercel.app"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
