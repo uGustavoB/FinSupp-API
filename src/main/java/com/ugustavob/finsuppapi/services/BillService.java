@@ -13,6 +13,7 @@ import com.ugustavob.finsuppapi.entities.subscription.SubscriptionEntity;
 import com.ugustavob.finsuppapi.entities.subscription.SubscriptionStatus;
 import com.ugustavob.finsuppapi.entities.transaction.TransactionEntity;
 import com.ugustavob.finsuppapi.exception.BillNotFoundException;
+import com.ugustavob.finsuppapi.exception.BusinessException;
 import com.ugustavob.finsuppapi.repositories.BillItemRepository;
 import com.ugustavob.finsuppapi.repositories.BillRepository;
 import com.ugustavob.finsuppapi.specifications.BillSpecification;
@@ -233,6 +234,32 @@ public class BillService {
         List<BillItemEntity> bills = billItemRepository.findByTransaction(transaction);
 
         removeEntityFromBill(bills);
+    }
+
+    public void validateSubscriptionDeletion(SubscriptionEntity subscription) {
+        List<BillItemEntity> items = billItemRepository.findAllBySubscriptionId(subscription.getId());
+
+        for (BillItemEntity item : items) {
+            BillStatus status = item.getBill().getStatus();
+            if (status == BillStatus.CLOSED || status == BillStatus.PAID) {
+                throw new BusinessException("Não é possível excluir uma assinatura vinculada a faturas encerradas ou pagas.");
+            }
+        }
+    }
+
+    public void removeSubscriptionFromOpenBills(SubscriptionEntity subscription) {
+        List<BillItemEntity> items = billItemRepository.findAllBySubscriptionId(subscription.getId());
+
+        List<BillItemEntity> itemsToRemove = items.stream()
+                .filter(item -> item.getBill().getStatus() == BillStatus.OPEN)
+                .toList();
+
+        for (BillItemEntity item : itemsToRemove) {
+            BillEntity bill = item.getBill();
+            bill.setTotalAmount(bill.getTotalAmount() - subscription.getPrice());
+            billRepository.save(bill);
+            billItemRepository.delete(item);
+        }
     }
 
     private void removeEntityFromBill(List<BillItemEntity> bills) {

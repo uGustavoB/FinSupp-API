@@ -573,4 +573,23 @@ public class SubscriptionController {
                 subscription.entityToResponseDTO()
         ));
     }
+
+    @Operation(summary = "Delete a subscription")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Subscription deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Subscription not found"),
+            @ApiResponse(responseCode = "422", description = "Cannot delete subscription associated with closed/paid bills")
+    })
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @SecurityRequirement(name = "bearer")
+    public ResponseEntity<?> deleteSubscription(@PathVariable Integer id, HttpServletRequest request) {
+        UUID userId = baseService.checkIfUuidIsNull((UUID) request.getAttribute("id"));
+
+        subscriptionService.deleteSubscription(id, userId);
+
+        return ResponseEntity.ok(new SuccessResponseDTO<>(
+                "Subscription deleted"
+        ));
+    }
 }

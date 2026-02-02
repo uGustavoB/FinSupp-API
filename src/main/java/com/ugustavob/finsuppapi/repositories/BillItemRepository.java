@@ -39,4 +39,7 @@ public interface BillItemRepository extends JpaRepository<BillItemEntity, Intege
 
     @Query("SELECT bi FROM BillItemEntity bi WHERE bi.subscription.id = :subscriptionId AND bi.bill.status = 'OPEN'")
     Optional<BillItemEntity> findBySubscriptionId(@Param("subscriptionId") Integer subscriptionId);
+
+    @Query("SELECT bi FROM BillItemEntity bi WHERE bi.subscription.id = :subscriptionId")
+    List<BillItemEntity> findAllBySubscriptionId(@Param("subscriptionId") Integer subscriptionId);
 }

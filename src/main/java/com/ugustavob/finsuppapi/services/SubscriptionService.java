@@ -96,6 +96,18 @@ public class SubscriptionService {
         return subscriptionRepository.save(subscription);
     }
 
+    public void deleteSubscription(int id, UUID userId) {
+        SubscriptionEntity subscription = getSubscriptionById(id, userId);
+
+        billService.validateSubscriptionDeletion(subscription);
+
+        if (subscription.getStatus() == SubscriptionStatus.ACTIVE) {
+            billService.removeSubscriptionFromOpenBills(subscription);
+        }
+
+        subscriptionRepository.delete(subscription);
+    }
+
     public double getTotalValueForActiveSubscriptions(UUID userId) {
         return subscriptionRepository.sumActiveSubscriptionsByUserId(userId);
     }
